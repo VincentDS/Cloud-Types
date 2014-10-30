@@ -1,0 +1,62 @@
+\documentclass[a4paper,12pt]{report}
+
+% The following makes latex use nicer postscript fonts.
+\usepackage{times}
+\usepackage[english]{babel}
+\usepackage[colorlinks,urlcolor=blue,linkcolor=blue]{hyperref}
+
+\usepackage{vubtitlepage}
+\author{Vincent De Schutter}
+\title{Automagically shared and offline \\available data for the web}
+
+%\promotortitle{Promotor/Promotors}
+\promotor{Prof. Dr. Wolfgang De Meuter}
+\advisors{Tim Coppieters}
+\advisortitle{Begeleider}
+\faculty{Faculteit Wetenschappen en Bio-ingenieurswetenschappen}
+\department{Vakgroep Computerwetenschappen}
+\reason{Proefschrift ingediend met het oog op het behalen van de graad van \\
+Bachelor of Science in de computerwetenschappen}
+\date{Februari 2015}
+          
+\begin{document}
+
+% First dutch TitlePage
+\maketitlepage
+
+\faculty{Faculty of Science and Bio-Engineering Sciences}
+\advisortitle{Advisor}
+\department{Department of Computer Science}
+\reason{Bachelor Thesis submitted in partial fulfillment of the
+requirements \\for the degree of Bachelor of Science in Computer Science}
+
+\date{February 2015}
+
+% Then english TitlePage
+\maketitlepage
+
+
+\section{Introduction} % 1
+\section{Context} % 5
+
+This chapter includes an introduction to the main concepts of eventual consistency. 
+
+\subsection{Eventual Consistency} 
+
+One of the most important aspects of distributed systems is data replication. This consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availablilty, performance and safety of the distributed system. \\
+When one of the replicas is offline, availability is achieved by allowing access to the data through another replica. This also offers applications to work offline, which is one of the key subjects of this paper. \\
+If the data is replicated across multiple computers, also called sites, the user can reduce the latency by choosing the nearest site. Besides that, different requests can be handled concurrently which reduces the load on a specific site. \\
+Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data isn't lost because it can still be aqcuired from another site.
+
+\subsubsection{Pessimistic Replication}
+\subsubsection{Optimistic Replication}
+\subsection{Usage}
+\section{State-of-the-art} % 5
+\section{Cloud Types} % 10
+\section{Conclusion} % 1
+
+
+
+
+
+\end{document}
