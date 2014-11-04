@@ -3,11 +3,13 @@
 % The following makes latex use nicer postscript fonts.
 \usepackage{times}
 \usepackage[english]{babel}
-\usepackage[colorlinks,urlcolor=blue,linkcolor=blue]{hyperref}
-
+%\usepackage[colorlinks,urlcolor=blue,linkcolor=blue]{hyperref}
+\usepackage[grey,utopia]{quotchap}
 \usepackage{vubtitlepage}
+
+
 \author{Vincent De Schutter}
-\title{Automagically shared and offline \\available data for the web}
+\title{Preparatory: Automagically shared and \\offline available data for the web}
 
 %\promotortitle{Promotor/Promotors}
 \promotor{Prof. Dr. Wolfgang De Meuter}
@@ -15,7 +17,7 @@
 \advisortitle{Begeleider}
 \faculty{Faculteit Wetenschappen en Bio-ingenieurswetenschappen}
 \department{Vakgroep Computerwetenschappen}
-\reason{Proefschrift ingediend met het oog op het behalen van de graad van \\
+\reason{Voorbereiding voor Proefschrift ingediend met het oog op het behalen \\van de graad van 
 Bachelor of Science in de computerwetenschappen}
 \date{Februari 2015}
           
@@ -27,33 +29,51 @@ Bachelor of Science in de computerwetenschappen}
 \faculty{Faculty of Science and Bio-Engineering Sciences}
 \advisortitle{Advisor}
 \department{Department of Computer Science}
-\reason{Bachelor Thesis submitted in partial fulfillment of the
-requirements \\for the degree of Bachelor of Science in Computer Science}
+\reason{Preparatory to Bachelor Thesis submitted in partial fulfillment of the \\
+requirements for the degree of Bachelor of Science in Computer Science}
 
 \date{February 2015}
 
 % Then english TitlePage
 \maketitlepage
 
+\tableofcontents
+\newpage
 
-\section{Introduction} % 1
-\section{Context} % 5
+\chapter{Introduction} % 1
+%TODO
+\chapter{Context} % 5
 
+%TODO
 This chapter includes an introduction to the main concepts of eventual consistency. 
 
-\subsection{Eventual Consistency} 
+\section{Eventual Consistency} 
 
-One of the most important aspects of distributed systems is data replication. This consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availablilty, performance and safety of the distributed system. \\
+One of the most important aspects of distributed systems is data replication. This phenomenon is used in a wide range of applications, such as databases, caches, and many more. In this case, data replication will consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availablilty, performance and safety of the distributed system. \\
 When one of the replicas is offline, availability is achieved by allowing access to the data through another replica. This also offers applications to work offline, which is one of the key subjects of this paper. \\
 If the data is replicated across multiple computers, also called sites, the user can reduce the latency by choosing the nearest site. Besides that, different requests can be handled concurrently which reduces the load on a specific site. \\
-Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data isn't lost because it can still be aqcuired from another site.
+Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data isn't lost because it can still be aqcuired from another site.\\
+\newline
+If they are talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focusses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
 
-\subsubsection{Pessimistic Replication}
-\subsubsection{Optimistic Replication}
-\subsection{Usage}
-\section{State-of-the-art} % 5
-\section{Cloud Types} % 10
-\section{Conclusion} % 1
+\subsection{Pessimistic Replication}
+
+The main purpose of pessimistic replication is trying to maintain one single consistent state of the data on all the different sites. This can be achieved by allowing updates to a specific piece of data only when it is consistent with all other replications. If some data is not up to date, it will be locked until it's consistent. Hence the name "pessimistic". This technique is also known as strong consistency due the fact that there is only one single view of the data and therefore all the replicas are consistent. Pessimistic replication is used in a wide range of applications and algorithms. For example, primary-copy algorithms, elect a primary replica that is responsible for handling all access to a specific object. If the primary replica receives an update of this object, it will be propagated synchronously to all secondary replicas. In case the primary replica crashes, the other replicas agree to assign another primary replica. A drawback of this technique is the deployment on a wide-area network for two reasons. \\
+\indent First, replicas could be unavailable for too long due the slowness en unreliability of the Internet. This causes even more problems with the raise of mobile devices with intermittent connectivity. Synchronizing with an unavailable replica, would block the device indefinitely. \\
+\indent The second reason relates to scalability towards wide-area networks. Applications with pessimistic replication on larger networks often have more users and replicas. The more users, the more updates will occur, the more time the replicas need to wait to send the updates to the other replicas. \\
+Because of this two reasons pessimistic replication is mainly used in local-area applications. A major part uses optimistic replication instead.
+
+\subsection{Optimistic Replication}
+
+When replicated data needs to be shared efficiently in a wide-area network, optimistic replication is a preferable solution. The key difference between optimistic and pessimistic replication is the possibility to access and update replicas synchronously without locking the data. However this feature gives rise to new conflicts. If a piece of data isn't locked, two or more operations can concurrently adjust the piece of data. This leads to inconsistent data and thus inconsistent replicas. 
+
+Optimistic replication is ofter referred as eventual consistency
+
+
+\section{Usage}
+\chapter{State-of-the-art} % 5
+\chapter{Cloud Types} % 10
+\chapter{Conclusion} % 1
 
 
 
