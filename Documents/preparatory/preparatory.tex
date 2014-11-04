@@ -65,12 +65,17 @@ Because of this two reasons pessimistic replication is mainly used in local-area
 
 \subsection{Optimistic Replication}
 
-When replicated data needs to be shared efficiently in a wide-area network, optimistic replication is a preferable solution. The key difference between optimistic and pessimistic replication is the possibility to access and update replicas synchronously without locking the data. However this feature gives rise to new conflicts. If a piece of data isn't locked, two or more operations can concurrently adjust the piece of data. This leads to inconsistent data and thus inconsistent replicas. 
+When replicated data needs to be shared efficiently in a wide-area network, optimistic replication is a preferable solution. The key difference between optimistic and pessimistic replication is the possibility to access and update replicas synchronously without locking the data. However this feature gives rise to new conflicts. If a piece of data isn't locked, two or more operations can concurrently adjust the piece of data. This leads to inconsistent data and thus inconsistent replicas. The optimistic part of this algorithm is the assumption that these concurrent operations occur sporadically or will be easy to resolve. However, the impact of the concurrent operations depends on the application. \\
+\indent For example, when two users perform an operation on the same piece of date independently. The first user updates the data while the seconds user removes the data. Will the data been removed or been updated when the two operations are merged? The first one, often called "lost-updates", causes the first user to lose his updates. The second possibility will undo the removal of the second user. This won't seem that complicated, however what will happen if three or more users perform an operation on the same piece of data? \\
+It is the role of consistency models to ensure that all the replicas, who have the possibility to temporarily differ from each other, converge to one single consistent state. Thus the replicas will be eventual consistent. Hence, optimistic replication is often referred as eventual consistency. Due the high availability of eventual consistent applications, the data can be, without first synchronizing, accessed and updated concurrently. This feature makes it possible to work with an unreliable or even without a connection. \\
 
-Optimistic replication is ofter referred as eventual consistency
+\subsection{Elements of Eventual Consistency}
 
 
-\section{Usage}
+
+
+
+\section{Applications}
 \chapter{State-of-the-art} % 5
 \chapter{Cloud Types} % 10
 \chapter{Conclusion} % 1
