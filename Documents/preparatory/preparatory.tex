@@ -5,6 +5,7 @@
 \usepackage[english]{babel}
 %\usepackage[colorlinks,urlcolor=blue,linkcolor=blue]{hyperref}
 \usepackage[grey,utopia]{quotchap}
+\usepackage{booktabs}
 \usepackage{vubtitlepage}
 
 
@@ -52,9 +53,9 @@ This chapter includes an introduction to the main concepts of eventual consisten
 One of the most important aspects of distributed systems is data replication. This phenomenon is used in a wide range of applications, such as databases, caches, and many more. In this case, data replication will consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availablilty, performance and safety of the distributed system. \\
 When one of the replicas is offline, availability is achieved by allowing access to the data through another replica. This also offers applications to work offline, which is one of the key subjects of this paper. \\
 If the data is replicated across multiple computers, also called sites, the user can reduce the latency by choosing the nearest site. Besides that, different requests can be handled concurrently which reduces the load on a specific site. \\
-Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data isn't lost because it can still be aqcuired from another site.\\
+Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data is not lost because it can still be aqcuired from another site.\\
 \newline
-If they are talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focusses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
+When talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focusses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
 
 \subsection{Pessimistic Replication}
 
@@ -71,7 +72,26 @@ It is the role of consistency models to ensure that all the replicas, who have t
 
 \subsection{Elements of Eventual Consistency}
 
+When talking about eventual consistency, there are a few important basic concepts one needs to know. These terms are also widely used throughout this paper and the actual paper about eventual consistency. 
+\newline
 
+\begin{table}
+	\centering
+    \begin{tabular}{c|p{12cm}}
+    	\toprule
+   		 Term & Meaning \\
+    	\midrule
+    	Site & A single computer which stores a copy of replicated data in a replicated system is called a site. \\
+    	Object & A notion of the minimal unit in a replicated system. \\
+    	Replica & A copy of a particular object on a particular site. \\
+    	\bottomrule
+    \end{tabular}
+    \caption{Common terms in eventual consistency.}
+\end{table}
+
+As mentioned earlier, the key of data replication is the fact that data is replicated across several computers. These computers are often called \textit{sites}. Sometimes master sites are distinguished from normal sites, where master sites have full read and write access, and normal sites are only allowed to read the replicated data. This replicated data, which is on each site, consists of multiple small components. These are known as \textit{replicas} of an \textit{object}. One can view an object as the minimal unit of a replication. While a replica is the copy of a particular object on a particular site. Logically, a site stores numerous replicas, but in order to not make it too complex, replica often refers to all the replicas on a site. \\
+\newline
+An operation
 
 
 
