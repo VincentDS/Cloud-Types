@@ -67,7 +67,7 @@ Because of this two reasons pessimistic replication is mainly used in local-area
 \subsection{Optimistic Replication}
 
 When replicated data needs to be shared efficiently in a wide-area network, optimistic replication is a preferable solution. The key difference between optimistic and pessimistic replication is the possibility to access and update replicas synchronously without locking the data. However this feature gives rise to new conflicts. If a piece of data isn't locked, two or more operations can concurrently adjust the piece of data. This leads to inconsistent data and thus inconsistent replicas. The optimistic part of this algorithm is the assumption that these concurrent operations occur sporadically or will be easy to resolve. However, the impact of the concurrent operations depends on the application. \\
-\indent For example, when two users perform an operation on the same piece of date independently. The first user updates the data while the seconds user removes the data. Will the data been removed or been updated when the two operations are merged? The first one, often called "lost-updates", causes the first user to lose his updates. The second possibility will undo the removal of the second user. This won't seem that complicated, however what will happen if three or more users perform an operation on the same piece of data? \\
+\indent For example, when two users perform an operation on the same piece of date independently. The first user updates the data while the seconds user removes the data. Will the data been removed or been updated when the two operations are merged? The first one, often called 'lost-updates', causes the first user to lose his updates. The second possibility will undo the removal of the second user. This won't seem that complicated, however what will happen if three or more users perform an operation on the same piece of data? \\
 It is the role of consistency models to ensure that all the replicas, who have the possibility to temporarily differ from each other, converge to one single consistent state. Thus the replicas will be eventual consistent. Hence, optimistic replication is often referred as eventual consistency. Due the high availability of eventual consistent applications, the data can be, without first synchronizing, accessed and updated concurrently. This feature makes it possible to work with an unreliable or even without a connection. \\
 
 \subsection{Elements of Eventual Consistency}
@@ -76,24 +76,33 @@ When talking about eventual consistency, there are a few important basic concept
 \newline
 
 \begin{table}
+    \small
 	\centering
-    \begin{tabular}{c|p{12cm}}
+    \begin{tabular}{l|p{9,5cm}}
     	\toprule
-   		 Term & Meaning \\
+   		Term & Meaning \\
     	\midrule
     	Site & A single computer which stores a copy of replicated data in a replicated system is called a site. \\
-    	Object & A notion of the minimal unit in a replicated system. \\
+    	Object & A notion of the minimal data unit in a replicated system. \\
     	Replica & A copy of a particular object on a particular site. \\
+        Operation & A local update performed on one of the replicas. \\
+        Tentative operation & Local operations that are not yet part of the final order of the system. \\
+        Operation-transfer & Eventual consistency system where operations are described more semantically. \\
+        State-transfer & Eventual consistency system where operations are limited to overwrite entire objects. \\
+        Log & A list of recent operations stored on each site. \\
+        Conflict & The phenomen when multiple users perform concurrent updates to the same object. \\
+        Propagation & The process responsible for sending operations to the other sites. \\
+        Commitment & The algorithm guaranteeing sites to agree on the set and final order of all the operations. \\
     	\bottomrule
     \end{tabular}
     \caption{Common terms in eventual consistency.}
 \end{table}
 
-As mentioned earlier, the key of data replication is the fact that data is replicated across several computers. These computers are often called \textit{sites}. Sometimes master sites are distinguished from normal sites, where master sites have full read and write access, and normal sites are only allowed to read the replicated data. This replicated data, which is on each site, consists of multiple small components. These are known as \textit{replicas} of an \textit{object}. One can view an object as the minimal unit of a replication. While a replica is the copy of a particular object on a particular site. Logically, a site stores numerous replicas, but in order to not make it too complex, replica often refers to all the replicas on a site. \\
-\newline
-An operation
-
-
+As mentioned earlier, the key of data replication is the fact that data is replicated across several computers. These computers are often called \textit{sites}. Sometimes master sites are distinguished from normal sites, where master sites have full read and write access, and normal sites are only allowed to read the replicated data. This replicated data, which is on each site, consists of multiple small components. These are known as \textit{replicas} of an \textit{object}. One can view an object as the minimal unit of a replication. While a replica is the copy of a particular object on a particular site. Logically, a site stores numerous replicas, but in order to not make it too complex, a replica often refers to all the replicas on a site. \\
+\indent An eventual consistent application allows the users to access and update replicas synchronously. Such local updates performed on one of the replicas are called \textit{operations}. When describing algorithms, it is useful to distinguish systems who describe operations more semantically, called \textit{operation-transfer systems}, from \textit{state-transfer systems}, where operations are limited to overwrite the entire object. Actually the second system is like a degenerate form of the first system. Operation-transfer systems maintain a history, also known as a log, of all recent operations on each replica. From this history they agree on the set and final order of the eventual operations. This increases the flexibilty of conflict resolution, as well as the efficiency when objects are large. Maintaining eventual consistency in state-transfer systems is much simpler because only the newest object needs to be kept. \\
+\indent Operations in the log of a particular site, but not yet part of the absolute order of the eventual consistent system, are often called \textit{tentative operations}. The reason that these operations are tentative and not permanent, relates to the possibility of multiple users modifying the same object at the same time. This causes a \textit{conflict} to arise. One could simple ignore such situation, for instance an airplane ticket reservation system could handle two concurrent requests to the same seat by picking one and discarding the other. This was previously mentioned as 'lost-updates'. However, a better way to handle this problem is to detect conflicting operations, for example with vector clocks, subsequently resolving them. Resolving can be performed by the user or by automatic conflict resolution strategies. \\
+\indent Eventually, operations stored in the log, needs to be sent to the other sites. This process is referred as \textit{propagation}. A common propagation technique is called epidemic propagation, which allows all sites to receive operations from each other even when they are not directly connected. More particular, sites propagate their own operations as well as the operations received from another site to their 'neighbours'. Operations spread like a virus, hence epidemic propagation. However, this technique can only be used when sites are directly connected with each other, which is usually not the case for offline available we applications. \\
+\indent As previously mentioned, the sites needs to agree on the set and final order of all the operations and conflict resolution results. The algorithm guaranteeing this key concept is called \textit{commitment}. 
 
 \section{Applications}
 \chapter{State-of-the-art} % 5
@@ -105,3 +114,7 @@ An operation
 
 
 \end{document}
+
+%Bibliografie:
+
+%cs.metrostate.edu/~fitzgesu/courses/ics662/spring10/Notes/SaitoSummary.htm
