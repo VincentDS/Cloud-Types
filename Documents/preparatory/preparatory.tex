@@ -105,6 +105,19 @@ As mentioned earlier, the key of data replication is the fact that data is repli
 \indent As previously mentioned, the sites needs to agree on the set and final order of all the operations and conflict resolution results. The algorithm guaranteeing this key concept is called \textit{commitment}. 
 
 \section{Applications}
+
+In previous sections, eventual consistency is described in general, making it rather abstract. The reason for this relates to the wide range of eventual consistent applications. Therefore, it is useful to discuss a few applications in which this concept can be used. \\
+First, it is possible to distinguish three types of architectures used in these application: client EC, server EC and peer-to-peer EC. Where 'EC' stands for eventual consistency. In a client EC architecture, data on the server will be replicated among all the different clients. Thus the server plays the role of the master site while the clients are considered normal sites. This is shown in figure~\ref{fig:clientEC}, the server in the middle replicates the data to the clients on the outside. Note that a client is not necessarily key advantage of this architecture is the possibility for clients to modify and read data even when completely disconnected from the internet. However depending on the application, it is recommended to sporadically synchronize with the server to push and pull new updates in order that replicas do not differ too much from each other. \\
+
+
+\begin{figure}
+    \small
+    \centering
+    \includegraphics[scale=0.3]{clientEC.png}
+    \caption{A client EC architecture.}
+    \label{fig:clientEC}
+\end{figure}
+
 \chapter{State-of-the-art} % 5
 \chapter{Cloud Types} % 10
 \chapter{Conclusion} % 1
