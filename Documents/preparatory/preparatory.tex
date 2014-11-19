@@ -107,8 +107,8 @@ As mentioned earlier, the key of data replication is the fact that data is repli
 \section{Applications}
 
 In previous sections, eventual consistency is described in general, making it rather abstract. The reason for this relates to the wide range of eventual consistent applications. Therefore, it is useful to discuss a few applications in which this concept can be used. \\
-First, it is possible to distinguish three types of architectures used in these application: client EC, server EC and peer-to-peer EC. Where 'EC' stands for eventual consistency. In a client EC architecture, data on the server will be replicated among all the different clients. Thus the server plays the role of the master site while the clients are considered normal sites. This is shown in figure~\ref{fig:clientEC}, the server in the middle replicates the data to the clients on the outside. Note that a client is not necessarily key advantage of this architecture is the possibility for clients to modify and read data even when completely disconnected from the internet. However depending on the application, it is recommended to sporadically synchronize with the server to push and pull new updates in order that replicas do not differ too much from each other. \\
-
+First, it is possible to distinguish three types of architectures used in these application: client EC, server EC and peer-to-peer EC. Where 'EC' stands for eventual consistency. In a client EC architecture, data on the server will be replicated among all the different clients. Thus the server plays the role of the master site while the clients are considered normal sites. This is shown in figure~\ref{fig:clientEC}, the server in the middle replicates the data to the clients on the outside. Note that a client is not necessarily a computer, but can be a mobile device as well. A key advantage of this architecture is the possibility for clients to modify and read data even when completely disconnected from the internet. However depending on the application, it is recommended to sporadically synchronize with the server to push and pull new updates in order that replicas do not differ too much from each other. \\
+Server EC and peer-to-peer EC architectures will not be further discussed as the considered applications are based upon a client EC architecture. As the title of this paper presumes, the main focus in this paper are shared and offline available data for the web. This boils down to the implementation of offline available collaborative web applications. Properties of such collaborative applications is that they run in a web browser, and that it is still possible to use the functionalities, once disconnected from the internet. 
 
 \begin{figure}
     \small
@@ -117,6 +117,10 @@ First, it is possible to distinguish three types of architectures used in these 
     \caption{A client EC architecture.}
     \label{fig:clientEC}
 \end{figure}
+
+\subsection{Birdwatching}
+
+The first application is a simple birdwatching tool. The main purpose of this application is to track the sort and amount of birds a single person or group has spotted. After users registered themselves, they can add birds. To add a bird, the user enters the name of the bird and the amount of times he has seen it. It is also possible to collaborate with multiple users on one single list of spotted birds. To share a list, the users hands out a unique token peculiar to every list. 
 
 \chapter{State-of-the-art} % 5
 \chapter{Cloud Types} % 10
