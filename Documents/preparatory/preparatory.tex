@@ -7,6 +7,7 @@
 \usepackage[grey,utopia]{quotchap}
 \usepackage{booktabs}
 \usepackage{vubtitlepage}
+\usepackage[bottom]{footmisc}
 
 
 \author{Vincent De Schutter}
@@ -41,14 +42,14 @@ requirements for the degree of Bachelor of Science in Computer Science}
 \tableofcontents
 \newpage
 
-\chapter{Introduction} % 1
+\chapter{Introduction}\label{cha:Introduction} % 1
 %TODO
-\chapter{Context} % 5
+\chapter{Context}\label{cha:Context} % 5
 
 %TODO
 This chapter includes an introduction to the main concepts of eventual consistency. 
 
-\section{Eventual Consistency} 
+\section{Eventual Consistency}\label{sec:EventualConsistency}
 
 One of the most important aspects of distributed systems is data replication. This phenomenon is used in a wide range of applications, such as databases, caches, and many more. In this case, data replication will consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availablilty, performance and safety of the distributed system. \\
 When one of the replicas is offline, availability is achieved by allowing access to the data through another replica. This also offers applications to work offline, which is one of the key subjects of this paper. \\
@@ -57,20 +58,20 @@ Another benefit of data replication is safety. If replicas are considered as bac
 \newline
 When talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focusses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
 
-\subsection{Pessimistic Replication}
+\subsection{Pessimistic Replication}\label{sec:PessimisticReplication}
 
 The main purpose of pessimistic replication is trying to maintain one single consistent state of the data on all the different sites. This can be achieved by allowing updates to a specific piece of data only when it is consistent with all other replications. If some data is not up to date, it will be locked until it's consistent. Hence the name "pessimistic". This technique is also known as strong consistency due the fact that there is only one single view of the data and therefore all the replicas are consistent. Pessimistic replication is used in a wide range of applications and algorithms. For example, primary-copy algorithms, elect a primary replica that is responsible for handling all access to a specific object. If the primary replica receives an update of this object, it will be propagated synchronously to all secondary replicas. In case the primary replica crashes, the other replicas agree to assign another primary replica. A drawback of this technique is the deployment on a wide-area network for two reasons. \\
 \indent First, replicas could be unavailable for too long due the slowness en unreliability of the Internet. This causes even more problems with the raise of mobile devices with intermittent connectivity. Synchronizing with an unavailable replica, would block the device indefinitely. \\
 \indent The second reason relates to scalability towards wide-area networks. Applications with pessimistic replication on larger networks often have more users and replicas. The more users, the more updates will occur, the more time the replicas need to wait to send the updates to the other replicas. \\
 Because of this two reasons pessimistic replication is mainly used in local-area applications. A major part uses optimistic replication instead.
 
-\subsection{Optimistic Replication}
+\subsection{Optimistic Replication}\label{sec:OptimisticReplication}
 
 When replicated data needs to be shared efficiently in a wide-area network, optimistic replication is a preferable solution. The key difference between optimistic and pessimistic replication is the possibility to access and update replicas synchronously without locking the data. However this feature gives rise to new conflicts. If a piece of data isn't locked, two or more operations can concurrently adjust the piece of data. This leads to inconsistent data and thus inconsistent replicas. The optimistic part of this algorithm is the assumption that these concurrent operations occur sporadically or will be easy to resolve. However, the impact of the concurrent operations depends on the application. \\
 \indent For example, when two users perform an operation on the same piece of date independently. The first user updates the data while the seconds user removes the data. Will the data been removed or been updated when the two operations are merged? The first one, often called 'lost-updates', causes the first user to lose his updates. The second possibility will undo the removal of the second user. This won't seem that complicated, however what will happen if three or more users perform an operation on the same piece of data? \\
 It is the role of consistency models to ensure that all the replicas, who have the possibility to temporarily differ from each other, converge to one single consistent state. Thus the replicas will be eventual consistent. Hence, optimistic replication is often referred as eventual consistency. Due the high availability of eventual consistent applications, the data can be, without first synchronizing, accessed and updated concurrently. This feature makes it possible to work with an unreliable or even without a connection. \\
 
-\subsection{Elements of Eventual Consistency}
+\subsection{Elements of Eventual Consistency}\label{sec:Elements}
 
 When talking about eventual consistency, there are a few important basic concepts one needs to know. These terms are also widely used throughout this paper and the actual paper about eventual consistency. 
 \newline
@@ -101,10 +102,10 @@ When talking about eventual consistency, there are a few important basic concept
 As mentioned earlier, the key of data replication is the fact that data is replicated across several computers. These computers are often called \textit{sites}. Sometimes master sites are distinguished from normal sites, where master sites have full read and write access, and normal sites are only allowed to read the replicated data. This replicated data, which is on each site, consists of multiple small components. These are known as \textit{replicas} of an \textit{object}. One can view an object as the minimal unit of a replication. While a replica is the copy of a particular object on a particular site. Logically, a site stores numerous replicas, but in order to not make it too complex, a replica often refers to all the replicas on a site. \\
 \indent An eventual consistent application allows the users to access and update replicas synchronously. Such local updates performed on one of the replicas are called \textit{operations}. When describing algorithms, it is useful to distinguish systems who describe operations more semantically, called \textit{operation-transfer systems}, from \textit{state-transfer systems}, where operations are limited to overwrite the entire object. Actually the second system is like a degenerate form of the first system. Operation-transfer systems maintain a history, also known as a log, of all recent operations on each replica. From this history they agree on the set and final order of the eventual operations. This increases the flexibilty of conflict resolution, as well as the efficiency when objects are large. Maintaining eventual consistency in state-transfer systems is much simpler because only the newest object needs to be kept. \\
 \indent Operations in the log of a particular site, but not yet part of the absolute order of the eventual consistent system, are often called \textit{tentative operations}. The reason that these operations are tentative and not permanent, relates to the possibility of multiple users modifying the same object at the same time. This causes a \textit{conflict} to arise. One could simple ignore such situation, for instance an airplane ticket reservation system could handle two concurrent requests to the same seat by picking one and discarding the other. This was previously mentioned as 'lost-updates'. However, a better way to handle this problem is to detect conflicting operations, for example with vector clocks, subsequently resolving them. Resolving can be performed by the user or by automatic conflict resolution strategies. \\
-\indent Eventually, operations stored in the log, needs to be sent to the other sites. This process is referred as \textit{propagation}. A common propagation technique is called epidemic propagation, which allows all sites to receive operations from each other even when they are not directly connected. More particular, sites propagate their own operations as well as the operations received from another site to their 'neighbours'. Operations spread like a virus, hence epidemic propagation. However, this technique can only be used when sites are directly connected with each other, which is usually not the case for offline available we applications. \\
+\indent Eventually, operations stored in the log, needs to be sent to the other sites. This process is referred as \textit{propagation}. A common propagation technique is called epidemic propagation, which allows all sites to receive operations from each other even when they are not directly connected. More particular, sites propagate their own operations as well as the operations received from another site to their 'neighbours'. Operations spread like a virus, hence epidemic propagation. However, this technique can only be used when sites are directly connected with each other, which is usually not the case for offline available web applications. \\
 \indent As previously mentioned, the sites needs to agree on the set and final order of all the operations and conflict resolution results. The algorithm guaranteeing this key concept is called \textit{commitment}. 
 
-\section{Applications}
+\section{Applications}\label{sec:Applications}
 
 In previous sections, eventual consistency is described in general, making it rather abstract. The reason for this relates to the wide range of eventual consistent applications. Therefore, it is useful to discuss a few applications in which this concept can be used. \\
 First, it is possible to distinguish three types of architectures used in these application: client EC, server EC and peer-to-peer EC. Where 'EC' stands for eventual consistency. In a client EC architecture, data on the server will be replicated among all the different clients. Thus the server plays the role of the master site while the clients are considered normal sites. This is shown in figure~\ref{fig:clientEC}, the server in the middle replicates the data to the clients on the outside. Note that a client is not necessarily a computer, but can be a mobile device as well. A key advantage of this architecture is the possibility for clients to modify and read data even when completely disconnected from the internet. However depending on the application, it is recommended to sporadically synchronize with the server to push and pull new updates in order that replicas do not differ too much from each other. \\
@@ -118,20 +119,59 @@ Server EC and peer-to-peer EC architectures will not be further discussed as the
     \label{fig:clientEC}
 \end{figure}
 
-\subsection{Birdwatching}
+\subsection{Birdwatching}\label{subsec:Birdwatching}
 
-The first application is a simple birdwatching tool. The main purpose of this application is to track the sort and amount of birds a single person or group has spotted. After users registered themselves, they can add birds. To add a bird, the user enters the name of the bird and the amount of times he has seen it. It is also possible to collaborate with multiple users on one single list of spotted birds. To share a list, the user hands out a unique token peculiar to every list. From now on, users who received the token, can enter the token to synchronize with the list to collaborate. After synchronization, all operations work seamlessly while offline. For example, two birdwatchers, Alice and Bob use the application to share the type and amount of birds they have seen. Alice is located in a place with intermittent internet connection, while Bob has no problems at all. However, Alice can still add birds, even without internet connection. Let say Alice presumed she has seen an eagle and adds it to the list. At the same time, Bob spotted three ribons in his bird's nest at home, also adding it to the list. After synchronization by both users, the list shows one eagle and three ribons. Now, the alleged eagle comes closer, and appears to be a falcon. Alice quickly deletes the eagle entry in the list, and adds a falcon. Meanwhile, Bob has spotted another eagle flying around his home. Now, when Alice regains connection, she should see one falcon, one eagle (The one Bob has seen) and three ribons. If the application is poorly designed, the amount of eagles might be two instead of one, since at the moment Bob enters an eagle, he still assumus Alice has seen an eagle instead of a falcon, making the amount of eagles two. In a well designed eventually consistent application, these values will be added or substracted, so the list will show only one eagle, one falcon and three ribons.
+The first application is a simple birdwatching tool. The main purpose of this application is to track the sort and amount of birds a single person or group has spotted. After users registered themselves, they can add birds. To add a bird, the user enters the name of the bird and the amount of times he has seen it. It is also possible to collaborate with multiple users on one single list of spotted birds. To share a list, the user hands out a unique token peculiar to every list. From now on, users who received the token, can enter the token to synchronize with the list to collaborate. After synchronization, all operations work seamlessly while offline. For example, two birdwatchers, Alice and Bob use the application to share the type and amount of birds they have seen. Alice is located in a place with intermittent internet connection, while Bob has no problems at all. However, Alice can still add birds, even without internet connection. Let say Alice presumed she has seen an eagle and adds it to the list. At the same time, Bob spotted three robins in his bird's nest at home, also adding it to the list. After synchronization by both users, the list shows one eagle and three robins. Now, the alleged eagle comes closer, and appears to be a falcon. Alice quickly deletes the eagle entry in the list, and adds a falcon. Meanwhile, Bob has spotted another eagle flying around his home. Now, when Alice regains connection, she should see one falcon, one eagle (The one Bob has seen) and three robins. If the application is poorly designed, the amount of eagles might be two instead of one, since at the moment Bob enters an eagle, he still assumus Alice has seen an eagle instead of a falcon, making the amount of eagles two. In a well designed eventually consistent application, these values will be added or substracted, so the list will show only one eagle, one falcon and three robins.
 
-\subsection{Version Control System}
+\subsection{Version Control System}\label{subsec:VCS}
 
 The second example is a Version Control System. The purpose of such a system is to manage documents, programs, websites, and other information data, by storing all the changes made in the data. This enables to track each change, and to reverse changes when necessary. These systems are essential for distributed and collaborative development. A few examples are Git\footnote{Git, \url{http://git-scm.com/}}, Mercurial\footnote{Mercurial, \url{http://mercurial.selenic.com/}} and Pixelapse\footnote{Pixelapse, \url{https://www.pixelapse.com/}}. Users can create their own repository. Every file in this repository will be tracked. Just as in the birdwatching example, problems might arise when used concurrently. If Alice and Bob are sharing a repository, they need to be able to modificate files at the same time. One solution is to make sure data can only be changed when connected to the server. So the server always checks if a constraint is not violated. But because the main purpose of this paper is offline available and collaborative web applications, offline availability is important. Yet, it is impossible to allow offline availability without the arise of conflicts considering the change of the same set of data. However a possible solution is to notify the users if they regain connection, in order to solve the conflict. 
 
-\chapter{State-of-the-art} % 5
+\chapter{Preparatory Work}\label{cha:StateOfTheArt} % 5
+
+While previous chapter introduced some of the key concepts and possible applications of eventual consistency, this chapter will focus on the current state of the art of eventual consistency. Although eventual consistency is not a new concept, in fact it has been around for more than 30 years, there seems to be a recent interest. This is mainly due to the rise of mobile devices with intermittent connection and the need for large scattered servers to ensure availability. Multiple systems and models, investigated and developed, will be discussed in order to extract the useful information to model a system for implementing offline available collaborative web applications. This system will be fully described in section~\ref{cha:CloudTypes}. \\
+
+In 2000 Eric Brewer, a professor at the University of California, conceived the CAP conjecture. This conjecture asserts that distributed systems only have two of three desirable properties. These properties are consistency, availability and partition tolerance, hence the abbreviation 'CAP'. Two years later, in 2002, Gilbert and Lynch actually proved Brewer's conjecture, transforming it into a theorem.
+
+\begin{description}
+ \item[Consistency] \hfill \\In a consistent system, there is a guarantee that all nodes, at any time, share the same view of the data. In fact, this is the the key feature of pessimistic replication, discussed in section~\ref{sec:PessimisticReplication}.
+ \item[Availability] \hfill \\This property implies that data is always available for reading or writing. This is mostly achieved by distributing the data over multiple servers, so that when a site crashes, the data is still available on other sites. (cf. section~\ref{sec:Elements})
+ \item[Partition Tolerance] \hfill \\A partition tolerant application continues to work despite network failures. For example, When data is replicated over N sites, and for some reason there is no or intermittent connection among some sites. As a result, the nodes are unable to synchronize data, thus a part of the system does not work. Such partition causes the system to lose either consistency or availability.
+\end{description}
+
+Important to note is that instead of the fact that one must sacrifice a property for two other properties, it is interesting that one can sacrifice one of the properties. This makes the theorem of great importance, especially for eventual consistency, where the consistency property can be left out. The introduction of the CAP theorem led to a new wave of researchers, diverging from the ACID model. ACID consists of the properties availability, consistency, isolation and durability and provide a gaurantee that distributed transactions are processed reliable. Thus, where consistency is obligatory in ACID, one is allowed to drop this property using the CAP theorem. This model, where availability and partition tolerance is chosen above consistency, is often called BASE (Basically Available, Soft state, Eventual consistency). \\
+However, over the years it became clear that the "2 of 3" formulation was misleading. In fact, hybrid solutions were more common than applications strictly following the CAP formulation. Thus, about a decade later, Eric Brewer revised his theorem. The revision of his theorem described that distributed applications have to balance out consistency and availability in the presence of partitioning. In fact, the developer has to maximize combinations of consistency and availability that make sense for the kind of application. Addionally, he stated that this balancing can occur at different levels and even at particular operations in the system. Hence, this revision is a much more fine-grained description of the original thereom, confirming what everyone implicitly noticed in the beginning. 
+
+\section{State of The Art}\label{sec:StateOfTheArt}
+
+As mentioned previously, the introduction of the CAP thereom led to a new wave of researchers. These researchers have come up with numerous designs and models for the problems arising when one sacrifices consistency for availabilty. In this section, three models will be explained in more detail in order to extract useful information for the system that will be implemented. 
+
+\subsection{NoSQL}\label{subsec:NoSQL}
+
+Relational databases like SQL have been the primary model during the past decades, but when one needs to handle large volumes of data, these kind of databases are not well scalable. Therefore, while SQL is based on the ACID model, NoSQL takes a different approach by relying on the BASE model. In general, NoSQL are simple key-value stores without a predefined schema. In contrast to the tabular relations in SQL, this completely different model allows easy horizontal scalability (e.g. adding more nodes to a system instead of adding more resources to a single node) in order to cope with increasing data volumes and access. Despite the fact that it uses a different model, some SQL operations are still supported, hence it is also called 'not only SQL'. There are multiple types of NoSQL, which can be distinguished in four main categories. 
+
+\begin{description}
+ \item[Key-value Stores] \hfill \\This type is the most simple model and easy to implement. The main idea is that every item in the database consists of a key mapped to a particular value using hash tables. However it has some disadvantages, including the inefficiency of querying or updating only a part of a value. Examples of Key-value stores are Voldemort\footnote{Voldemort, \url{http://www.project-voldemort.com/}}, Dynamo\footnote{Dynamo, \url{http://aws.amazon.com/dynamodb/}} and Riak\footnote{Riak, \url{http://basho.com/riak/}}.
+ \item[Wide Column Stores] \hfill \\Wide Column stores, often called extensible record stores, store data in key-value pairs with the ability to store a very large number of dynamic columns, i.e. values. Since the keys and the values are extensible, wide column stores can be seen as two-dimensional Key-value stores. Example of such stores are Google's BigTable\footnote{Google BigTable, \url{http://research.google.com/archive/bigtable.html}}, which is used for for most of Google's services, and Cassandra\footnote{Cassandra, \url{http://cassandra.apache.org/}}.
+ \item[Document Databases] \hfill \\Document stores, also called document-oriented database systems, are described by a schema-less data organization. In fact, they can be seen as key-value stores on steroids. First, values can exist out of multiple columns, just like in wide column stores, called documents. secondly, these documents do not need to have a uniform structure. Finally, the nesting of documents is also supported. These documents often store internal notations like JSON or XML, which can be directly processed. Examples of these databases are MongoDB\footnote{MondoDB, \url{http://www.mongodb.org/}} and CouchDB\footnote{CouchDB, \url{http://couchdb.apache.org/}}.    
+ \item[Graph Databases] \hfill \\Graph databases represent data in graph structures. These consist out of nodes, who are connected through edges. They are used to store everything related to graphs and processing of data specific to the graph (e.g. distance between two nodes). An example of this type is Neo4J\footnote{Neo4J, \url{http://neo4j.com/}}.    
+\end{description}
+
+In fact, NoSQL do not have the eventual consistency properties that will be used in this paper. The goal of NoSQL databases is to achieve availability on the server-side, by using horizontal scalibility. Hence, NoSQL is focussed on server EC (cf. section~\ref{sec:Applications}). The goal in this the model of this paper is client EC or replicating data to clients, in order to allow offline usage. However, NoSQL has to largest share in the eventual consistency community. 
+
+\subsection{Bayou}\label{subsec:Bayou}
 
 
 
-\chapter{Cloud Types} % 10
-\chapter{Conclusion} % 1
+\subsection{CRDT}\label{subsec:CRDT}
+
+\section{Model}\label{sec:Model}
+
+
+
+
+\chapter{Cloud Types}\label{cha:CloudTypes} % 10
+\chapter{Conclusion}\label{cha:Conclusion} % 1
 
 
 
@@ -142,3 +182,10 @@ The second example is a Version Control System. The purpose of such a system is 
 %Bibliografie:
 
 %cs.metrostate.edu/~fitzgesu/courses/ics662/spring10/Notes/SaitoSummary.htm
+%http://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed
+%https://www.cs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf
+%http://ivoroshilin.com/2012/12/13/brewers-cap-theorem-explained-base-versus-acid/
+%http://db-engines.com/en/article/Wide+Column+Stores
+%http://rebelic.nl/2011/05/28/the-four-categories-of-nosql-databases/
+%http://db-engines.com/en/article/Document+Stores
+%http://db-engines.com/en/article/Graph+DBMS
