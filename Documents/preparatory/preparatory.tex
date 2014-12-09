@@ -161,9 +161,12 @@ In fact, NoSQL do not have the eventual consistency properties that will be used
 
 \subsection{Bayou}\label{subsec:Bayou}
 
-
+Bayou is a mobile distributed database allowing mobile users to use their applications offline. The database can be replicated across multiple sites, i.e. mobile devices or servers. Users on a mobile device, can use and modify the database while offline and thereafter synchronize with any other database that the he finds, when connected. Updates are done in SQL statements and propagated to other sites using epidemic propagation. Received updates are applied tentatively locally but because sites receives operation in different orders, thet have to undo and redo some operations while learning the total order of operations, determined by master sites. If a operation results in a conflict, it can be detected and resolved by an application-specific precondition and deterministic merge procedure defined by the developer, both connected to the operation. A major drawback though is that the system is entirely build on the requirement of epidemic propagation, which causes the inability to ensure strong consistency whe necessary. As previously mentioned, the developer can write application-specific merge procedures to avoid conflicts, but this becomes quickly complicated. \\
+Considering this, Bayou is an interesting model where the implementing system can be based upon. Although, it lacks a few important elements such as strong consistency on demand and predefined merge procedures which provide commutativity (cf. section~\ref{sec:Model}). 
 
 \subsection{CRDT}\label{subsec:CRDT}
+
+
 
 \section{Model}\label{sec:Model}
 
@@ -189,3 +192,4 @@ In fact, NoSQL do not have the eventual consistency properties that will be used
 %http://rebelic.nl/2011/05/28/the-four-categories-of-nosql-databases/
 %http://db-engines.com/en/article/Document+Stores
 %http://db-engines.com/en/article/Graph+DBMS
+%http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.7323
