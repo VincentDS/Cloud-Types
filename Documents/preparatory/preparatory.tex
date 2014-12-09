@@ -164,16 +164,21 @@ In fact, NoSQL do not have the eventual consistency properties that will be used
 Bayou is a mobile distributed database allowing mobile users to use their applications offline. The database can be replicated across multiple sites, i.e. mobile devices or servers. Users on a mobile device, can use and modify the database while offline and thereafter synchronize with any other database that the he finds, when connected. Updates are done in SQL statements and propagated to other sites using epidemic propagation. Received updates are applied tentatively locally but because sites receives operation in different orders, thet have to undo and redo some operations while learning the total order of operations, determined by master sites. If a operation results in a conflict, it can be detected and resolved by an application-specific precondition and deterministic merge procedure defined by the developer, both connected to the operation. A major drawback though is that the system is entirely build on the requirement of epidemic propagation, which causes the inability to ensure strong consistency whe necessary. As previously mentioned, the developer can write application-specific merge procedures to avoid conflicts, but this becomes quickly complicated. \\
 Considering this, Bayou is an interesting model where the implementing system can be based upon. Although, it lacks a few important elements such as strong consistency on demand and predefined merge procedures which provide commutativity (cf. section~\ref{sec:Model}). 
 
-\subsection{CRDT}\label{subsec:CRDT}
+\subsection{Commutative Replicated Data Types (CRDT)}\label{subsec:CRDT}
 
+Up to now, the eventual consistency community consists of numerous specific problems and applications such as distributed text editing, distributed file system, NoSQL databases,\ldots  But so far, there are few attempts to bring eventual consistency closer to the programming language itself, with dedicated concepts and models from which various eventual consistent application can be developed. In fact, this is the purpose of Commutative Replicated Data Types, abbreviated by CRDT. These data types can be found on the program level, replicated over various instances of the program. The key factor of these data types is that their operations are commutative. This means that the replicated data will converge to a single value, even if operations on the same piece of data occurred concurrently. In other words, the operations do not conflict with each other. In a system without commutative operations, the system does not know in which order the operations must be executed. Also one of the sites where the operation came from, needs to reschedule the operation in order to be consistent with the other site by undoing and redoing operations. \\
+\indent For example, two clients are executing operation \textit{x} and \textit{y} concurrently. If the total order will be \textit{xy}, client 2 has to undo \textit{y}, do \textit{x} and redo \textit{y}. If the total order will be \textit{yx}, client 1 has to undo \textit{x}, do \textit{y} and redo \textit{x}. However, if the system uses commutative operations, \textit{xy} and \textit{yx} produce the same state. \\
+In fact, commutative operations leads to the redundancy of operation scheduling. 
 
 
 \section{Model}\label{sec:Model}
 
 
 
-
 \chapter{Cloud Types}\label{cha:CloudTypes} % 10
+
+
+
 \chapter{Conclusion}\label{cha:Conclusion} % 1
 
 
@@ -193,3 +198,4 @@ Considering this, Bayou is an interesting model where the implementing system ca
 %http://db-engines.com/en/article/Document+Stores
 %http://db-engines.com/en/article/Graph+DBMS
 %http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.7323
+%http://pagesperso-systeme.lip6.fr/Marc.Shapiro/papers/RR-6956.pdf
