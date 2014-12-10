@@ -56,7 +56,7 @@ When one of the replicas is offline, availability is achieved by allowing access
 If the data is replicated across multiple computers, also called sites, the user can reduce the latency by choosing the nearest site. Besides that, different requests can be handled concurrently which reduces the load on a specific site. \\
 Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data is not lost because it can still be aqcuired from another site.\\
 \newline
-When talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focusses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
+When talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focuses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
 
 \subsection{Pessimistic Replication}\label{sec:PessimisticReplication}
 
@@ -157,7 +157,7 @@ Relational databases like SQL have been the primary model during the past decade
  \item[Graph Databases] \hfill \\Graph databases represent data in graph structures. These consist out of nodes, who are connected through edges. They are used to store everything related to graphs and processing of data specific to the graph (e.g. distance between two nodes). An example of this type is Neo4J\footnote{Neo4J, \url{http://neo4j.com/}}.    
 \end{description}
 
-In fact, NoSQL do not have the eventual consistency properties that will be used in this paper. The goal of NoSQL databases is to achieve availability on the server-side, by using horizontal scalibility. Hence, NoSQL is focussed on server EC (cf. section~\ref{sec:Applications}). The goal in this the model of this paper is client EC or replicating data to clients, in order to allow offline usage. However, NoSQL has to largest share in the eventual consistency community. 
+In fact, NoSQL do not have the eventual consistency properties that will be used in this paper. The goal of NoSQL databases is to achieve availability on the server-side, by using horizontal scalibility. Hence, NoSQL is focused on server EC (cf. section~\ref{sec:Applications}). The goal in this the model of this paper is client EC or replicating data to clients, in order to allow offline usage. However, NoSQL has to largest share in the eventual consistency community. 
 
 \subsection{Bayou}\label{subsec:Bayou}
 
@@ -168,13 +168,23 @@ Considering this, Bayou is an interesting model where the implementing system ca
 
 Up to now, the eventual consistency community consists of numerous specific problems and applications such as distributed text editing, distributed file system, NoSQL databases,\ldots  But so far, there are few attempts to bring eventual consistency closer to the programming language itself, with dedicated concepts and models from which various eventual consistent application can be developed. In fact, this is the purpose of Commutative Replicated Data Types, abbreviated by CRDT. These data types can be found on the program level, replicated over various instances of the program. The key factor of these data types is that their operations are commutative. This means that the replicated data will converge to a single value, even if operations on the same piece of data occurred concurrently. In other words, the operations do not conflict with each other. In a system without commutative operations, the system does not know in which order the operations must be executed. Also one of the sites where the operation came from, needs to reschedule the operation in order to be consistent with the other site by undoing and redoing operations. \\
 \indent For example, two clients are executing operation \textit{x} and \textit{y} concurrently. If the total order will be \textit{xy}, client 2 has to undo \textit{y}, do \textit{x} and redo \textit{y}. If the total order will be \textit{yx}, client 1 has to undo \textit{x}, do \textit{y} and redo \textit{x}. However, if the system uses commutative operations, \textit{xy} and \textit{yx} produce the same state. \\
-In fact, commutative operations leads to the superfluity of operation scheduling. An example of such operations in our daily live is the addition. If two persons, i.e. clients, concurrently add some number to the same number, it does not matter in which order the additions occurred. \\
+In fact, commutative operations leads to the superfluity of operation scheduling. An example of such operations in our daily lives is the addition. If two persons, i.e. clients, concurrently add some number to the same number, it does not matter in which order the additions occurred. \\
 There are roughly three distinguishable types of CRDT. operation-based CRDT's communicate witch each other by interchanging isolated operations, while state-based CRDT's interchange whole states. Finally, delta CRDT's combines the features of the previous CRDT's. \\ 
 \\
 Although this is a good solution for some operations, this can not be used for all operations and applications. Take for example a key-value store where names are mapped on phone numbers. If two clients concurrently set the value of the same person, lost-updates will occur (cf. section~\ref{sec:OptimisticReplication}). There is no commutative solution for this problem. Yet, the model can be used to to reason about commutative operations in eventual consistent applications. As today, there are numerous of useful application where this concept already can be used. For example, Youtube views or Facebook likes. Riak (cf. section~\ref{subsec:NoSQL}) is also integrating CRDT concepts in their database system to ensure consistency at large scale for very low cost. 
 
-
 \section{Model}\label{sec:Model}
+
+After extracting some useful information from different eventual consistency models, it is time to find a programming model that could be suited to implement offline available collaborative web applications. This model must meet certain requirements, which are summarized below.
+
+\begin{description}
+ \item[Full-fledged Programming Model] \hfill \\The model should be a full-fledged programming model, in the sense that de developer can create his own distributed data and operations, resulting in a specific application. This generality can also be found in the CRDT model (cf. section~\ref{subsec:CRDT}). Distribution and synchronization of distributed data must be transparant for the developer.
+ \item[Transparent Disconnected Operations] \hfill \\A second criteria is the transparency of disconnected operations. The developer should not be engaged with checking whether the client is online or offline while executing a specific operation. The model should keep a kind of log where executed operations are stored and automatically synchronized once the client regains connection. 
+ \item[Commutativity] \hfill \\As mentioned previously, commutative operations leads to the disapparance of conflicts and the superfluity of operation scheduling while ensuring consistency at large scale. A model supporting this kind of operation would be a nice bonus.  
+ \item[Strong consistency on demand] \hfill \\Sometimes strong consistency is essential in a distributed application. For example in a ticket reservation application, a user do not want to hear after the reservation that his reservation is eventually cancelled. Thus, strong consistency on demand would increase de diversity of applications that could be realised with the model.
+\end{description}
+
+In order to take account of these requirements, Cloud Types seems to best solution to implement offline available collaborative web applications. Cloud types focuses on most of the above criteria. Although, it has some shortcomings for easily implementing the desired applications. The Cloud Types model will be discussed in detail in the following section.
 
 
 
