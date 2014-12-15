@@ -1,0 +1,40 @@
+// declaration of cloud data
+global totalBirds : CInt;
+
+Index BirdList[name: String] {
+  amountSpotted: CInt;
+}
+
+// operations representing user actions
+function spotBird(name: String, amount: Int) {
+  totalBirds.add(count);
+  BirdList[name].amountSpotted.add(amount);
+}
+
+function unspotBird(name: String, amount: Int) {
+  totalBirds.add(- amount);
+  BirdList[name].amountSpotted.add(- amount);
+}
+
+function display() {
+  foreach b in entries BirdList.amountSpotted {
+    print(b.amountSpotted.get() + " " + b.name);
+  }
+  print(totalBirds.get() + " total");
+}
+
+// main event loop
+function main() {
+    // allow send/receive of updates
+    yield();
+
+    match (NextUserCommand()) with {
+      spot s n:
+        spotBird(s, n);
+      unspot s n:
+        unspotBird(s, n);
+      display:
+        display();
+      quit:
+    } 
+}

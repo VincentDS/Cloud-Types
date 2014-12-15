@@ -7,7 +7,34 @@
 \usepackage[grey,utopia]{quotchap}
 \usepackage{booktabs}
 \usepackage{vubtitlepage}
+\usepackage{listings}
+\usepackage{color}
 \usepackage[bottom]{footmisc}
+
+% Code listings costumization
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codeblue}{rgb}{0,0,0.85}
+\definecolor{codelightblue}{rgb}{0,0,0.5}
+\definecolor{codered}{rgb}{0.85,0,0}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codered},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle, escapeinside={<@}{@>}}
 
 
 \author{Vincent De Schutter}
@@ -51,10 +78,10 @@ This chapter includes an introduction to the main concepts of eventual consisten
 
 \section{Eventual Consistency}\label{sec:EventualConsistency}
 
-One of the most important aspects of distributed systems is data replication. This phenomenon is used in a wide range of applications, such as databases, caches, and many more. In this case, data replication will consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availablilty, performance and safety of the distributed system. \\
+One of the most important aspects of distributed systems is data replication. This phenomenon is used in a wide range of applications, such as databases, caches, and many more. In this case, data replication will consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availability, performance and safety of the distributed system. \\
 When one of the replicas is offline, availability is achieved by allowing access to the data through another replica. This also offers applications to work offline, which is one of the key subjects of this paper. \\
 If the data is replicated across multiple computers, also called sites, the user can reduce the latency by choosing the nearest site. Besides that, different requests can be handled concurrently which reduces the load on a specific site. \\
-Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data is not lost because it can still be aqcuired from another site.\\
+Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data is not lost because it can still be acquired from another site.\\
 \newline
 When talking about data replication, there are roughly two types to distinguish. The first one is called traditional or pessimistic replication. This is a more strong technique that focuses on consistent data at the expense of availability. If the data needs to be more available but may differ a little, optimistic replication is a better solution.
 
@@ -91,7 +118,7 @@ When talking about eventual consistency, there are a few important basic concept
         Operation-transfer & Eventual consistency system where operations are described more semantically. \\
         State-transfer & Eventual consistency system where operations are limited to overwrite entire objects. \\
         Log & A list of recent operations stored on each site. \\
-        Conflict & The phenomen when multiple users perform concurrent updates to the same object. \\
+        Conflict & The phenomenon when multiple users perform concurrent updates to the same object. \\
         Propagation & The process responsible for sending operations to the other sites. \\
         Commitment & The algorithm guaranteeing sites to agree on the set and final order of all the operations. \\
     	\bottomrule
@@ -100,9 +127,9 @@ When talking about eventual consistency, there are a few important basic concept
 \end{table}
 
 As mentioned earlier, the key of data replication is the fact that data is replicated across several computers. These computers are often called \textit{sites}. Sometimes master sites are distinguished from normal sites, where master sites have full read and write access, and normal sites are only allowed to read the replicated data. This replicated data, which is on each site, consists of multiple small components. These are known as \textit{replicas} of an \textit{object}. One can view an object as the minimal unit of a replication. While a replica is the copy of a particular object on a particular site. Logically, a site stores numerous replicas, but in order to not make it too complex, a replica often refers to all the replicas on a site. \\
-\indent An eventual consistent application allows the users to access and update replicas synchronously. Such local updates performed on one of the replicas are called \textit{operations}. When describing algorithms, it is useful to distinguish systems who describe operations more semantically, called \textit{operation-transfer systems}, from \textit{state-transfer systems}, where operations are limited to overwrite the entire object. Actually the second system is like a degenerate form of the first system. Operation-transfer systems maintain a history, also known as a log, of all recent operations on each replica. From this history they agree on the set and final order of the eventual operations. This increases the flexibilty of conflict resolution, as well as the efficiency when objects are large. Maintaining eventual consistency in state-transfer systems is much simpler because only the newest object needs to be kept. \\
+\indent An eventual consistent application allows the users to access and update replicas synchronously. Such local updates performed on one of the replicas are called \textit{operations}. When describing algorithms, it is useful to distinguish systems who describe operations more semantically, called \textit{operation-transfer systems}, from \textit{state-transfer systems}, where operations are limited to overwrite the entire object. Actually the second system is like a degenerate form of the first system. Operation-transfer systems maintain a history, also known as a log, of all recent operations on each replica. From this history they agree on the set and final order of the eventual operations. This increases the flexibility of conflict resolution, as well as the efficiency when objects are large. Maintaining eventual consistency in state-transfer systems is much simpler because only the newest object needs to be kept. \\
 \indent Operations in the log of a particular site, but not yet part of the absolute order of the eventual consistent system, are often called \textit{tentative operations}. The reason that these operations are tentative and not permanent, relates to the possibility of multiple users modifying the same object at the same time. This causes a \textit{conflict} to arise. One could simple ignore such situation, for instance an airplane ticket reservation system could handle two concurrent requests to the same seat by picking one and discarding the other. This was previously mentioned as 'lost-updates'. However, a better way to handle this problem is to detect conflicting operations, for example with vector clocks, subsequently resolving them. Resolving can be performed by the user or by automatic conflict resolution strategies. \\
-\indent Eventually, operations stored in the log, needs to be sent to the other sites. This process is referred as \textit{propagation}. A common propagation technique is called epidemic propagation, which allows all sites to receive operations from each other even when they are not directly connected. More particular, sites propagate their own operations as well as the operations received from another site to their 'neighbours'. Operations spread like a virus, hence epidemic propagation. However, this technique can only be used when sites are directly connected with each other, which is usually not the case for offline available web applications. \\
+\indent Eventually, operations stored in the log, needs to be sent to the other sites. This process is referred as \textit{propagation}. A common propagation technique is called epidemic propagation, which allows all sites to receive operations from each other even when they are not directly connected. More particular, sites propagate their own operations as well as the operations received from another site to their 'neighbors'. Operations spread like a virus, hence epidemic propagation. However, this technique can only be used when sites are directly connected with each other, which is usually not the case for offline available web applications. \\
 \indent As previously mentioned, the sites needs to agree on the set and final order of all the operations and conflict resolution results. The algorithm guaranteeing this key concept is called \textit{commitment}. 
 
 \section{Applications}\label{sec:Applications}
@@ -121,7 +148,7 @@ Server EC and peer-to-peer EC architectures will not be further discussed as the
 
 \subsection{Birdwatching}\label{subsec:Birdwatching}
 
-The first application is a simple birdwatching tool. The main purpose of this application is to track the sort and amount of birds a single person or group has spotted. After users registered themselves, they can add birds. To add a bird, the user enters the name of the bird and the amount of times he has seen it. It is also possible to collaborate with multiple users on one single list of spotted birds. To share a list, the user hands out a unique token peculiar to every list. From now on, users who received the token, can enter the token to synchronize with the list to collaborate. After synchronization, all operations work seamlessly while offline. For example, two birdwatchers, Alice and Bob use the application to share the type and amount of birds they have seen. Alice is located in a place with intermittent internet connection, while Bob has no problems at all. However, Alice can still add birds, even without internet connection. Let say Alice presumed she has seen an eagle and adds it to the list. At the same time, Bob spotted three robins in his bird's nest at home, also adding it to the list. After synchronization by both users, the list shows one eagle and three robins. Now, the alleged eagle comes closer, and appears to be a falcon. Alice quickly deletes the eagle entry in the list, and adds a falcon. Meanwhile, Bob has spotted another eagle flying around his home. Now, when Alice regains connection, she should see one falcon, one eagle (The one Bob has seen) and three robins. If the application is poorly designed, the amount of eagles might be two instead of one, since at the moment Bob enters an eagle, he still assumus Alice has seen an eagle instead of a falcon, making the amount of eagles two. In a well designed eventually consistent application, these values will be added or substracted, so the list will show only one eagle, one falcon and three robins.
+The first application is a simple birdwatching tool. The main purpose of this application is to track the sort and amount of birds a single person or group has spotted. After users registered themselves, they can add birds. To add a bird, the user enters the name of the bird and the amount of times he has seen it. It is also possible to collaborate with multiple users on one single list of spotted birds. To share a list, the user hands out a unique token peculiar to every list. From now on, users who received the token, can enter the token to synchronize with the list to collaborate. After synchronization, all operations work seamlessly while offline. For example, two birdwatchers, Alice and Bob use the application to share the type and amount of birds they have seen. Alice is located in a place with intermittent internet connection, while Bob has no problems at all. However, Alice can still add birds, even without internet connection. Let say Alice presumed she has seen an eagle and adds it to the list. At the same time, Bob spotted three robins in his bird's nest at home, also adding it to the list. After synchronization by both users, the list shows one eagle and three robins. Now, the alleged eagle comes closer, and appears to be a falcon. Alice quickly deletes the eagle entry in the list, and adds a falcon. Meanwhile, Bob has spotted another eagle flying around his home. Now, when Alice regains connection, she should see one falcon, one eagle (The one Bob has seen) and three robins. If the application is poorly designed, the amount of eagles might be two instead of one, since at the moment Bob enters an eagle, he still assumes Alice has seen an eagle instead of a falcon, making the amount of eagles two. In a well designed eventually consistent application, these values will be added or subtracted, so the list will show only one eagle, one falcon and three robins.
 
 \subsection{Version Control System}\label{subsec:VCS}
 
@@ -139,12 +166,12 @@ In 2000 Eric Brewer, a professor at the University of California, conceived the 
  \item[Partition Tolerance] \hfill \\A partition tolerant application continues to work despite network failures. For example, When data is replicated over N sites, and for some reason there is no or intermittent connection among some sites. As a result, the nodes are unable to synchronize data, thus a part of the system does not work. Such partition causes the system to lose either consistency or availability.
 \end{description}
 
-Important to note is that instead of the fact that one must sacrifice a property for two other properties, it is interesting that one can sacrifice one of the properties. This makes the theorem of great importance, especially for eventual consistency, where the consistency property can be left out. The introduction of the CAP theorem led to a new wave of researchers, diverging from the ACID model. ACID consists of the properties availability, consistency, isolation and durability and provide a gaurantee that distributed transactions are processed reliable. Thus, where consistency is obligatory in ACID, one is allowed to drop this property using the CAP theorem. This model, where availability and partition tolerance is chosen above consistency, is often called BASE (Basically Available, Soft state, Eventual consistency). \\
-However, over the years it became clear that the "2 of 3" formulation was misleading. In fact, hybrid solutions were more common than applications strictly following the CAP formulation. Thus, about a decade later, Eric Brewer revised his theorem. The revision of his theorem described that distributed applications have to balance out consistency and availability in the presence of partitioning. In fact, the developer has to maximize combinations of consistency and availability that make sense for the kind of application. Addionally, he stated that this balancing can occur at different levels and even at particular operations in the system. Hence, this revision is a much more fine-grained description of the original thereom, confirming what everyone implicitly noticed in the beginning. 
+Important to note is that instead of the fact that one must sacrifice a property for two other properties, it is interesting that one can sacrifice one of the properties. This makes the theorem of great importance, especially for eventual consistency, where the consistency property can be left out. The introduction of the CAP theorem led to a new wave of researchers, diverging from the ACID model. ACID consists of the properties availability, consistency, isolation and durability and provide a guarantee that distributed transactions are processed reliable. Thus, where consistency is obligatory in ACID, one is allowed to drop this property using the CAP theorem. This model, where availability and partition tolerance is chosen above consistency, is often called BASE (Basically Available, Soft state, Eventual consistency). \\
+However, over the years it became clear that the "2 of 3" formulation was misleading. In fact, hybrid solutions were more common than applications strictly following the CAP formulation. Thus, about a decade later, Eric Brewer revised his theorem. The revision of his theorem described that distributed applications have to balance out consistency and availability in the presence of partitioning. In fact, the developer has to maximize combinations of consistency and availability that make sense for the kind of application. Additionally, he stated that this balancing can occur at different levels and even at particular operations in the system. Hence, this revision is a much more fine-grained description of the original theorem, confirming what everyone implicitly noticed in the beginning. 
 
 \section{State of The Art}\label{sec:StateOfTheArt}
 
-As mentioned previously, the introduction of the CAP thereom led to a new wave of researchers. These researchers have come up with numerous designs and models for the problems arising when one sacrifices consistency for availabilty. In this section, three models will be explained in more detail in order to extract useful information for the system that will be implemented. 
+As mentioned previously, the introduction of the CAP theorem led to a new wave of researchers. These researchers have come up with numerous designs and models for the problems arising when one sacrifices consistency for availability. In this section, three models will be explained in more detail in order to extract useful information for the system that will be implemented. 
 
 \subsection{NoSQL}\label{subsec:NoSQL}
 
@@ -157,11 +184,11 @@ Relational databases like SQL have been the primary model during the past decade
  \item[Graph Databases] \hfill \\Graph databases represent data in graph structures. These consist out of nodes, who are connected through edges. They are used to store everything related to graphs and processing of data specific to the graph (e.g. distance between two nodes). An example of this type is Neo4J\footnote{Neo4J, \url{http://neo4j.com/}}.    
 \end{description}
 
-In fact, NoSQL do not have the eventual consistency properties that will be used in this paper. The goal of NoSQL databases is to achieve availability on the server-side, by using horizontal scalibility. Hence, NoSQL is focused on server EC (cf. section~\ref{sec:Applications}). The goal in this the model of this paper is client EC or replicating data to clients, in order to allow offline usage. However, NoSQL has to largest share in the eventual consistency community. 
+In fact, NoSQL do not have the eventual consistency properties that will be used in this paper. The goal of NoSQL databases is to achieve availability on the server-side, by using horizontal scalability. Hence, NoSQL is focused on server EC (cf. section~\ref{sec:Applications}). The goal in this the model of this paper is client EC or replicating data to clients, in order to allow offline usage. However, NoSQL has to largest share in the eventual consistency community. 
 
 \subsection{Bayou}\label{subsec:Bayou}
 
-Bayou is a mobile distributed database allowing mobile users to use their applications offline. The database can be replicated across multiple sites, i.e. mobile devices or servers. Users on a mobile device, can use and modify the database while offline and thereafter synchronize with any other database that the he finds, when connected. Updates are done in SQL statements and propagated to other sites using epidemic propagation. Received updates are applied tentatively locally but because sites receives operation in different orders, thet have to undo and redo some operations while learning the total order of operations, determined by master sites. If a operation results in a conflict, it can be detected and resolved by an application-specific precondition and deterministic merge procedure defined by the developer, both connected to the operation. A major drawback though is that the system is entirely build on the requirement of epidemic propagation, which causes the inability to ensure strong consistency whe necessary. As previously mentioned, the developer can write application-specific merge procedures to avoid conflicts, but this becomes quickly complicated. \\
+Bayou is a mobile distributed database allowing mobile users to use their applications offline. The database can be replicated across multiple sites, i.e. mobile devices or servers. Users on a mobile device, can use and modify the database while offline and thereafter synchronize with any other database that the he finds, when connected. Updates are done in SQL statements and propagated to other sites using epidemic propagation. Received updates are applied tentatively locally but because sites receives operation in different orders, thet have to undo and redo some operations while learning the total order of operations, determined by master sites. If a operation results in a conflict, it can be detected and resolved by an application-specific precondition and deterministic merge procedure defined by the developer, both connected to the operation. A major drawback though is that the system is entirely build on the requirement of epidemic propagation, which causes the inability to ensure strong consistency when necessary. As previously mentioned, the developer can write application-specific merge procedures to avoid conflicts, but this becomes quickly complicated. \\
 Considering this, Bayou is an interesting model where the implementing system can be based upon. Although, it lacks a few important elements such as strong consistency on demand and predefined merge procedures which provide commutativity (cf. section~\ref{sec:Model}). 
 
 \subsection{Commutative Replicated Data Types (CRDT)}\label{subsec:CRDT}
@@ -178,19 +205,87 @@ Although this is a good solution for some operations, this can not be used for a
 After extracting some useful information from different eventual consistency models, it is time to find a programming model that could be suited to implement offline available collaborative web applications. This model must meet certain requirements, which are summarized below.
 
 \begin{description}
- \item[Full-fledged Programming Model] \hfill \\The model should be a full-fledged programming model, in the sense that de developer can create his own distributed data and operations, resulting in a specific application. This generality can also be found in the CRDT model (cf. section~\ref{subsec:CRDT}). Distribution and synchronization of distributed data must be transparant for the developer.
+ \item[Full-fledged Programming Model] \hfill \\The model should be a full-fledged programming model, in the sense that de developer can create his own distributed data and operations, resulting in a specific application. This generality can also be found in the CRDT model (cf. section~\ref{subsec:CRDT}). Distribution and synchronization of distributed data must be transparent for the developer.
  \item[Transparent Disconnected Operations] \hfill \\A second criteria is the transparency of disconnected operations. The developer should not be engaged with checking whether the client is online or offline while executing a specific operation. The model should keep a kind of log where executed operations are stored and automatically synchronized once the client regains connection. 
- \item[Commutativity] \hfill \\As mentioned previously, commutative operations leads to the disapparance of conflicts and the superfluity of operation scheduling while ensuring consistency at large scale. A model supporting this kind of operation would be a nice bonus.  
- \item[Strong consistency on demand] \hfill \\Sometimes strong consistency is essential in a distributed application. For example in a ticket reservation application, a user do not want to hear after the reservation that his reservation is eventually cancelled. Thus, strong consistency on demand would increase de diversity of applications that could be realised with the model.
+ \item[Commutativity] \hfill \\As mentioned previously, commutative operations leads to the disappearance of conflicts and the superfluity of operation scheduling while ensuring consistency at large scale. A model supporting this kind of operation would be a nice bonus.  
+ \item[Strong consistency on demand] \hfill \\Sometimes strong consistency is essential in a distributed application. For example in a ticket reservation application, a user do not want to hear after the reservation that his reservation is eventually canceled. Thus, strong consistency on demand would increase de diversity of applications that could be realised with the model.
 \end{description}
 
 In order to take account of these requirements, Cloud Types seems to best solution to implement offline available collaborative web applications. Cloud types focuses on most of the above criteria. Although, it has some shortcomings for easily implementing the desired applications. The Cloud Types model will be discussed in detail in the following section.
 
 
-
 \chapter{Cloud Types}\label{cha:CloudTypes} % 10
 
+In previous sections the concept eventual consistency is explained along with several models and applications. This led to the agreement of using Cloud Types for developing offline available collaborative web applications. This section will give a more fine-grained explanation of these Cloud Types based on Sebastian Burckhardt's description.
 
+\section{Introduction}\label{sec:Introduction}
+
+The goal of Cloud Types is to make eventual consistency programming more convenient by providing eventual consistent storage at the programming level. This is achieved by the abstractation of several implementation details in an uniform language, in order to hide these complexities for the developer. Concretely, the developer can declare data using particular types, called \textit{cloud types}, which are automatically shared between the different devices. By bringing eventual consistency to the programming level, the amount of possible applications strongly increases. Clearly, the model solves different challenges that are daunting to implement in offline available collaborative web applications. The most common challenges are summarized below.
+
+\begin{description}
+ \item[Representation] \hfill \\Because web programming involves different communities, developers need to write and maintain huhge amounts of code between different data representations. For example, a simple web application connected to a database, needs to translate database representations (e.g. SQL) into server-side representations of the data types (e.g. Node.js). Subsequently, these data types need to be serialized for sending them to the client-side (e.g. JSON, XML). Finally, the developer needs to translate these data into HTML in order to display the appropriate data on the screen. In short, developers have to deal with different programming platform differences between databases, servers and clients. 
+ \item[Eventual Consistency] \hfill \\This includes the different challenges of eventual consistency mentioned in previous sections. These are data replication and propagation, conflict resolution, consistency between the different clients,\ldots
+ \item[Change Sets] \hfill \\If one wants to develop offline available collaborative web applications, storing just a local replica is not enough. Keeping a log of updates or a delta of the updates is necessary. When the client is reconnected, the log can be sent to the server so other clients can perform these updates.
+\end{description}
+
+Given these challenges, it is not surprising that apps almost no application has the requirements for the model. Hence, Cloud Types are introduced which ensures the transparency of these challenges for the developer, which allows him to focus on more application-specific data declarations and operations. The developer do not need to take into account several tasks like network communication, data synchronization and data presentation. The two main factors of this solution are:
+
+\begin{description}
+ \item[Cloud Types] \hfill \\The developer declares data, their wishing to share, using particular cloud types. This data is automatically replicated across all the clients and persisted both on local storage as well as in the cloud. the Cloud Types model includes two kinds of types. The first one, \textit{simple types}, mainly covers integers and strings. \textit{Structured types} provide more structured types as tables and indexes. These types will be further discussed in the execution model (cf. section~\ref{sec:ExecutionModel}). These types share the property of remaining predictable when concurrency occurs. The conflict resolution is done automatically, which reduces the developer's amount of work for writing merging procedures to zero.
+ \item[Revision Consistency] \hfill \\ The model uses \textit{revision diagrams} in order to make the different replicas converge, thus to ensure eventual consistency. This concept will be discussed in detail in the synchronization model (cf. section~\ref{sec:SynchronizationModel}). In short, the cloud stores the main revision, while the clients store local revision. These local revision will however be periodically synchronized with the cloud. In fact, one can consider this technique as the concept of Version Control Systems (cf. section~\ref{subsec:VCS}) applied to Cloud Types. The cloud acts as the main revision while the clients maintain a local revision by \textit{forking} and \textit{joining} from the main revision.
+\end{description} 
+
+This approach considers all aspects of the data model, thus there is only one single program and data format. The data model is not a new language but rather an extension for many existing languages. Currently, the model is partial implemented in the TouchDevelop mobile development environment, which allows developers to create collaborative web applications by making use of a mobile IDE. Fascinating is that although the servers maintain consistency, the developer does not write any code peculiar to the server. The different data declarations determine the processes on the server. 
+
+\section{Execution Model}\label{sec:ExecutionModel}
+
+\newpage
+%\lstinputlisting[language=Java,caption={A simple birdwatching application implemented in Cloud Types pseudo-language}]{birdwatching.txt}
+
+\begin{lstlisting}[language=Java,caption={A simple birdwatching application implemented in Cloud Types pseudo-language}]
+// declaration of cloud data
+<@\textcolor{codeblue}{global}@> totalBirds : <@\textcolor{codelightblue}{CInt}@>;
+
+<@\textcolor{codeblue}{Index}@> BirdList[name: <@\textcolor{codelightblue}{String}@>] {
+  amountSpotted: <@\textcolor{codelightblue}{CInt}@>;
+}
+
+// operations representing user actions
+<@\textcolor{codeblue}{function}@> spotBird(name: <@\textcolor{codelightblue}{String}@>, amount: <@\textcolor{codelightblue}{Int}@>) {
+  totalBirds.add(count);
+  BirdList[name].amountSpotted.add(amount);
+}
+
+<@\textcolor{codeblue}{function}@> unspotBird(name: <@\textcolor{codelightblue}{String}@>, amount: <@\textcolor{codelightblue}{Int}@>) {
+  totalBirds.add(- amount);
+  BirdList[name].amountSpotted.add(- amount);
+}
+
+<@\textcolor{codeblue}{function}@> display() {
+  <@\textcolor{codeblue}{foreach}@> b <@\textcolor{codeblue}{in}@> entries BirdList.amountSpotted {
+    print(b.amountSpotted.get() + " " + b.name);
+  }
+  print(totalBirds.get() + " total");
+}
+
+// main event loop
+<@\textcolor{codeblue}{function}@> main() {
+    // allow send/receive of updates
+    <@\textcolor{codeblue}{yield}@>();
+
+    match (NextUserCommand()) with {
+      spot s n:
+        spotBird(s, n);
+      unspot s n:
+        unspotBird(s, n);
+      display:
+        display();
+      quit:
+    } 
+}
+\end{lstlisting}
+
+\section{Synchronization Model}\label{sec:SynchronizationModel}
 
 \chapter{Conclusion}\label{cha:Conclusion} % 1
 
