@@ -5,11 +5,22 @@ Index BirdList[name: String] {
   amountSpotted: CInt;
 }
 
-Table BirdWatchers[] {
+Table BirdWatcher[] {
   name: CString;
 }
 
 // operations representing user actions
+function createBirdWatcher(name: String) {
+  var birdwatcher = new BirdWatcher();
+  birdwatcher.name = name;
+  return birdwatcher;
+}
+
+function deleteBirdWatcher(birdwatcher: BirdWatcher) {
+  //all entries in other tables that has this birdwatcher as key value, will also be deleted
+  delete birdwatcher;
+}
+
 function spotBird(name: String, amount: Int) {
   totalBirds.add(count);
   BirdList[name].amountSpotted.add(amount);

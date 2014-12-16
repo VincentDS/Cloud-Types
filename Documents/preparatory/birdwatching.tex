@@ -1,6 +1,6 @@
 %\lstinputlisting[language=Java,caption={A simple birdwatching application implemented in a typed javascript-like pseudo-language}]{birdwatching.txt}
 
-\begin{lstlisting}[language=Java,caption={A simple birdwatching application implemented in a typed javascript-like pseudo-language},label={lst:birdwatching}, float]
+\begin{lstlisting}[language=Java,caption={A simple birdwatching application implemented in a typed javascript-like pseudo-language},label={lst:birdwatching}]
 // declaration of cloud data
 <@\textcolor{codeblue}{global}@> totalBirds : <@\textcolor{codedarkblue}{CInt}@>;
 
@@ -8,11 +8,22 @@
   amountSpotted: <@\textcolor{codedarkblue}{CInt}@>;
 }
 
-<@\textcolor{codeblue}{Table}@> BirdWatchers[] {
+<@\textcolor{codeblue}{Table}@> BirdWatcher[] {
   name: <@\textcolor{codedarkblue}{CString}@>;
 }
 
 // operations representing user actions
+<@\textcolor{codeblue}{function}@> createBirdWatcher(name: <@\textcolor{codedarkblue}{String}@>) {
+  var birdwatcher = new <@\textcolor{codedarkblue}{BirdWatcher()}@>;
+  birdwatcher.name = name;
+  return birdwatcher;
+}
+
+<@\textcolor{codeblue}{function}@> deleteBirdWatcher(birdwatcher: <@\textcolor{codedarkblue}{BirdWatcher}@>) {
+  //all entries in other tables that has this birdwatcher as key value, will also be deleted
+  delete birdwatcher;
+}
+
 <@\textcolor{codeblue}{function}@> spotBird(name: <@\textcolor{codedarkblue}{String}@>, amount: <@\textcolor{codedarkblue}{Int}@>) {
   totalBirds.add(count);
   BirdList[name].amountSpotted.add(amount);
