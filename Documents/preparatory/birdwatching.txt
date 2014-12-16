@@ -5,6 +5,10 @@ Index BirdList[name: String] {
   amountSpotted: CInt;
 }
 
+Table BirdWatchers[] {
+  name: CString;
+}
+
 // operations representing user actions
 function spotBird(name: String, amount: Int) {
   totalBirds.add(count);

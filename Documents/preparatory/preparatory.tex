@@ -14,7 +14,7 @@
 % Code listings costumization
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codeblue}{rgb}{0,0,0.85}
-\definecolor{codelightblue}{rgb}{0,0,0.5}
+\definecolor{codedarkblue}{rgb}{0,0,0.5}
 \definecolor{codered}{rgb}{0.85,0,0}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
  
@@ -53,7 +53,7 @@ Bachelor of Science in de computerwetenschappen}
 \begin{document}
 
 % First dutch TitlePage
-\maketitlepage
+%\maketitlepage
 
 \faculty{Faculty of Science and Bio-Engineering Sciences}
 \advisortitle{Advisor}
@@ -205,10 +205,10 @@ Although this is a good solution for some operations, this can not be used for a
 After extracting some useful information from different eventual consistency models, it is time to find a programming model that could be suited to implement offline available collaborative web applications. This model must meet certain requirements, which are summarized below.
 
 \begin{description}
- \item[Full-fledged Programming Model] \hfill \\The model should be a full-fledged programming model, in the sense that de developer can create his own distributed data and operations, resulting in a specific application. This generality can also be found in the CRDT model (cf. section~\ref{subsec:CRDT}). Distribution and synchronization of distributed data must be transparent for the developer.
+ \item[Full-fledged Programming Model] \hfill \\The model should be a full-fledged programming model, in the sense that the developer can create his own distributed data and operations, resulting in a specific application. This generality can also be found in the CRDT model (cf. section~\ref{subsec:CRDT}). Distribution and synchronization of distributed data must be transparent for the developer.
  \item[Transparent Disconnected Operations] \hfill \\A second criteria is the transparency of disconnected operations. The developer should not be engaged with checking whether the client is online or offline while executing a specific operation. The model should keep a kind of log where executed operations are stored and automatically synchronized once the client regains connection. 
  \item[Commutativity] \hfill \\As mentioned previously, commutative operations leads to the disappearance of conflicts and the superfluity of operation scheduling while ensuring consistency at large scale. A model supporting this kind of operation would be a nice bonus.  
- \item[Strong consistency on demand] \hfill \\Sometimes strong consistency is essential in a distributed application. For example in a ticket reservation application, a user do not want to hear after the reservation that his reservation is eventually canceled. Thus, strong consistency on demand would increase de diversity of applications that could be realised with the model.
+ \item[Strong consistency on demand] \hfill \\Sometimes strong consistency is essential in a distributed application. For example in a ticket reservation application, a user do not want to hear after the reservation that his reservation is eventually canceled. Thus, strong consistency on demand would increase the diversity of applications that could be realised with the model.
 \end{description}
 
 In order to take account of these requirements, Cloud Types seems to best solution to implement offline available collaborative web applications. Cloud types focuses on most of the above criteria. Although, it has some shortcomings for easily implementing the desired applications. The Cloud Types model will be discussed in detail in the following section.
@@ -231,61 +231,38 @@ The goal of Cloud Types is to make eventual consistency programming more conveni
 Given these challenges, it is not surprising that apps almost no application has the requirements for the model. Hence, Cloud Types are introduced which ensures the transparency of these challenges for the developer, which allows him to focus on more application-specific data declarations and operations. The developer do not need to take into account several tasks like network communication, data synchronization and data presentation. The two main factors of this solution are:
 
 \begin{description}
- \item[Cloud Types] \hfill \\The developer declares data, their wishing to share, using particular cloud types. This data is automatically replicated across all the clients and persisted both on local storage as well as in the cloud. the Cloud Types model includes two kinds of types. The first one, \textit{simple types}, mainly covers integers and strings. \textit{Structured types} provide more structured types as tables and indexes. These types will be further discussed in the execution model (cf. section~\ref{sec:ExecutionModel}). These types share the property of remaining predictable when concurrency occurs. The conflict resolution is done automatically, which reduces the developer's amount of work for writing merging procedures to zero.
- \item[Revision Consistency] \hfill \\ The model uses \textit{revision diagrams} in order to make the different replicas converge, thus to ensure eventual consistency. This concept will be discussed in detail in the synchronization model (cf. section~\ref{sec:SynchronizationModel}). In short, the cloud stores the main revision, while the clients store local revision. These local revision will however be periodically synchronized with the cloud. In fact, one can consider this technique as the concept of Version Control Systems (cf. section~\ref{subsec:VCS}) applied to Cloud Types. The cloud acts as the main revision while the clients maintain a local revision by \textit{forking} and \textit{joining} from the main revision.
+ \item[Cloud Types] \hfill \\The developer declares data, their wishing to share, using particular cloud types. This data is automatically replicated across all the clients and persisted both on local storage as well as in the cloud. the Cloud Types model includes two kinds of types. The first one, \textit{simple types}, mainly covers integers and strings. \textit{Structured types} provide more structured types as tables and indexes. These types will be further discussed in the execution model (cf. section~\ref{subsec:ExecutionModel}). These types share the property of remaining predictable when concurrency occurs. The conflict resolution is done automatically, which reduces the developer's amount of work for writing merging procedures to zero.
+ \item[Revision Consistency] \hfill \\ The model uses \textit{revision diagrams} in order to make the different replicas converge, thus to ensure eventual consistency. This concept will be discussed in detail in the synchronization model (cf. section~\ref{subsec:SynchronizationModel}). In short, the cloud stores the main revision, while the clients store local revision. These local revision will however be periodically synchronized with the cloud. In fact, one can consider this technique as the concept of Version Control Systems (cf. section~\ref{subsec:VCS}) applied to Cloud Types. The cloud acts as the main revision while the clients maintain a local revision by \textit{forking} and \textit{joining} from the main revision.
 \end{description} 
 
 This approach considers all aspects of the data model, thus there is only one single program and data format. The data model is not a new language but rather an extension for many existing languages. Currently, the model is partial implemented in the TouchDevelop mobile development environment, which allows developers to create collaborative web applications by making use of a mobile IDE. Fascinating is that although the servers maintain consistency, the developer does not write any code peculiar to the server. The different data declarations determine the processes on the server. 
 
-\section{Execution Model}\label{sec:ExecutionModel}
+\section{Core Principles}\label{sec:CorePrinciples}
 
-\newpage
-%\lstinputlisting[language=Java,caption={A simple birdwatching application implemented in Cloud Types pseudo-language}]{birdwatching.txt}
+This section introduces the Cloud Types model in more detail on the basis of an example in pseudocode using a typed javascript-like language. This explanation is divided into two main parts. The first part, the execution model, handles the main concepts of Cloud Types along with the fundamental functionalities. The synchronization model focuses on the different synchronization mechanisms in order to guarantee eventual consistency.
 
-\begin{lstlisting}[language=Java,caption={A simple birdwatching application implemented in Cloud Types pseudo-language}]
-// declaration of cloud data
-<@\textcolor{codeblue}{global}@> totalBirds : <@\textcolor{codelightblue}{CInt}@>;
+\input{birdwatching.tex}
 
-<@\textcolor{codeblue}{Index}@> BirdList[name: <@\textcolor{codelightblue}{String}@>] {
-  amountSpotted: <@\textcolor{codelightblue}{CInt}@>;
-}
+\subsection{Execution Model}\label{subsec:ExecutionModel}
 
-// operations representing user actions
-<@\textcolor{codeblue}{function}@> spotBird(name: <@\textcolor{codelightblue}{String}@>, amount: <@\textcolor{codelightblue}{Int}@>) {
-  totalBirds.add(count);
-  BirdList[name].amountSpotted.add(amount);
-}
+Remember the birdwatching tool as explained in section~\ref{subsec:Birdwatching}. This application allows users to track the sort and amount of birds they spotted individually or in group. The code for this application is given in Listing~\ref{lst:birdwatching}. Note that the authorization part is left out because unnecessary to explain the model. \\
+\\
+First, consider the top of the code excerption, where the cloud data is declared. The data is called \textit{cloud} data because they remain in the cloud. Basically, this means that the data is automatically replicated across all the clients of a peculiar list in the birdwatching tool. In fact, it is very similar to declaring global variables in other languages. Some deviation from the original version are made. Firstly, the application is also tracking the total amount of birds spotted, independently from the type of bird. Secondly, the birdwatchers' names will be stored in a special table. These adaptations will be helpful to clarify some concepts further on. Thus, the application is storing three elements:
 
-<@\textcolor{codeblue}{function}@> unspotBird(name: <@\textcolor{codelightblue}{String}@>, amount: <@\textcolor{codelightblue}{Int}@>) {
-  totalBirds.add(- amount);
-  BirdList[name].amountSpotted.add(- amount);
-}
+\begin{enumerate}
+ \item To store the total amount of birds spotted, the variable \textbf{totalBirds} is declared. Note that the type of this variable is a \textcolor{codedarkblue}{CInt}, Where 'C' stands for cloud and 'Int' for integer. A cloud integer differs from a normal integer in the sense that it offers operations taking care of conflict resolution instead of the normal getter and setter. One of these operations is \textbf{add}, which is an example of the earlier defined commutative operations. Add expresses a relative rather than a absolute change to a number.
+ \item For storing the amount of a particular bird, a special data type \textcolor{codeblue}{Index} is used. Although this type is not prefixed with 'C', it is one of the two main cloud stores. This index \textbf{BirdList} is indexed by the name of the bird. Each entry in the index stores a cloud integer \textbf{amountSpotted}, holding the amount of specific birds are spotted. 
+ \item The names of all the birdwatchers is kept in a \textcolor{codeblue}{Table}. This data type is, just as the index, a collection to store cloud data. Each entry in the table \textbf{BirdWatchers} stores a \textcolor{codedarkblue}{CString} with the name of a birdwatcher. However, the difference with an index is the possibility to dynamically create and delete entries.
+\end{enumerate}
 
-<@\textcolor{codeblue}{function}@> display() {
-  <@\textcolor{codeblue}{foreach}@> b <@\textcolor{codeblue}{in}@> entries BirdList.amountSpotted {
-    print(b.amountSpotted.get() + " " + b.name);
-  }
-  print(totalBirds.get() + " total");
-}
+Before moving to the operations on the cloud data in the example, it is important to take a closer look to the cloud stores mentioned above. In the Cloud Types model there are two distinct cloud store constructs. The first one is \textcolor{codedarkblue}{Table}, which is used to store the birdwatchers' names. The second construct is \textcolor{codedarkblue}{Index}, which is used to maintain the amount of birds. Both types have the property that the data they store is shared between all the clients automatically. Thus, they are able to change the values locally and synchronize eventually with the other clients. \\ 
+\\
+A \textcolor{codeblue}{Table} is similar to a relational database table. As mentioned previously, one can dynamically create and delete entries in the table, what distinguishes it from a index construct. Thus, it has extensible rows, where each row has optionally keys and a number of columns. While the keys are fixed and need to be defined at creation time of the table, the columns values are variable in time. The keys of a table can consist of any type. It can be a normal primitive type like \textcolor{codedarkblue}{Int} and \textcolor{codedarkblue}{Boolean}, or one of the cloud stores, \textcolor{codeblue}{Table} and \textcolor{codeblue}{Index}. On the other hand, a column must be a cloud type like \textcolor{codedarkblue}{CString} and \textcolor{codedarkblue}{CInt}. In fact, the keys act as construction arguments or immutable fields and moreover possess a pleasant side-effect. When one of the keys of a table is another table, a deletion of an entry in the key table causes the deletion of all the entries in the main table depending on this deleted entry. 
+\\
 
-// main event loop
-<@\textcolor{codeblue}{function}@> main() {
-    // allow send/receive of updates
-    <@\textcolor{codeblue}{yield}@>();
 
-    match (NextUserCommand()) with {
-      spot s n:
-        spotBird(s, n);
-      unspot s n:
-        unspotBird(s, n);
-      display:
-        display();
-      quit:
-    } 
-}
-\end{lstlisting}
 
-\section{Synchronization Model}\label{sec:SynchronizationModel}
+\subsection{Synchronization Model}\label{subsec:SynchronizationModel}
 
 \chapter{Conclusion}\label{cha:Conclusion} % 1
 

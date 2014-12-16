@@ -1,0 +1,48 @@
+%\lstinputlisting[language=Java,caption={A simple birdwatching application implemented in a typed javascript-like pseudo-language}]{birdwatching.txt}
+
+\begin{lstlisting}[language=Java,caption={A simple birdwatching application implemented in a typed javascript-like pseudo-language},label={lst:birdwatching}, float]
+// declaration of cloud data
+<@\textcolor{codeblue}{global}@> totalBirds : <@\textcolor{codedarkblue}{CInt}@>;
+
+<@\textcolor{codeblue}{Index}@> BirdList[name: <@\textcolor{codedarkblue}{String}@>] {
+  amountSpotted: <@\textcolor{codedarkblue}{CInt}@>;
+}
+
+<@\textcolor{codeblue}{Table}@> BirdWatchers[] {
+  name: <@\textcolor{codedarkblue}{CString}@>;
+}
+
+// operations representing user actions
+<@\textcolor{codeblue}{function}@> spotBird(name: <@\textcolor{codedarkblue}{String}@>, amount: <@\textcolor{codedarkblue}{Int}@>) {
+  totalBirds.add(count);
+  BirdList[name].amountSpotted.add(amount);
+}
+
+<@\textcolor{codeblue}{function}@> unspotBird(name: <@\textcolor{codedarkblue}{String}@>, amount: <@\textcolor{codedarkblue}{Int}@>) {
+  totalBirds.add(- amount);
+  BirdList[name].amountSpotted.add(- amount);
+}
+
+<@\textcolor{codeblue}{function}@> display() {
+  <@\textcolor{codeblue}{foreach}@> b <@\textcolor{codeblue}{in}@> entries BirdList.amountSpotted {
+    print(b.amountSpotted.get() + " " + b.name);
+  }
+  print(totalBirds.get() + " total");
+}
+
+// main event loop
+<@\textcolor{codeblue}{function}@> main() {
+    // allow send/receive of updates
+    <@\textcolor{codeblue}{yield}@>();
+
+    match (NextUserCommand()) with {
+      spot s n:
+        spotBird(s, n);
+      unspot s n:
+        unspotBird(s, n);
+      display:
+        display();
+      quit:
+    } 
+}
+\end{lstlisting}
