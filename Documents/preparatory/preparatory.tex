@@ -73,12 +73,17 @@ requirements for the degree of Bachelor of Science in Computer Science}
 %TODO
 \chapter{Context}\label{cha:Context} % 5
 
-%TODO
-This chapter includes an introduction to the main concepts of eventual consistency. 
+This chapter includes an introduction to the main concepts of eventual consistency, also called optimistic replication. First, data replication is explained, which lies at the foundation of eventual consistency. Next, it is compared to the more traditional pessimistic replication, before elaborating on the elements that concern eventual consistency. Finally, some examples in which eventual consistency can be applied, are provided.
 
 \section{Eventual Consistency}\label{sec:EventualConsistency}
 
-One of the most important aspects of distributed systems is data replication. This phenomenon is used in a wide range of applications, such as databases, caches, and many more. In this case, data replication will consists out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availability, performance and safety of the distributed system. \\
+%TODO
+
+\subsection{Data Replication}
+
+In this paper the focus lies on replicating data on multiple computers, also known as data replication. These computers often try to achieve a common goal by communicating with each other over a predefined network. Some of these goals could be managing a large database, sharing computational power, and many more. Such systems using multiple computers, are called distributed systems.
+Thus, one of the most important aspects of distributed systems is data replication. %This phenomenon is used in a wide range of applications, such as databases, caches, and many more. 
+In this case, data replication will consist out of maintaining multiple copies of data on different computers. Those copies, often called replicas, improve the availability, performance and safety of the distributed system. \\
 When one of the replicas is offline, availability is achieved by allowing access to the data through another replica. This also offers applications to work offline, which is one of the key subjects of this paper. \\
 If the data is replicated across multiple computers, also called sites, the user can reduce the latency by choosing the nearest site. Besides that, different requests can be handled concurrently which reduces the load on a specific site. \\
 Another benefit of data replication is safety. If replicas are considered as backups, safety is attained. For example, when one of the replicas experiences a deadly crash, the data is not lost because it can still be acquired from another site.\\
@@ -95,7 +100,7 @@ Because of this two reasons pessimistic replication is mainly used in local-area
 \subsection{Optimistic Replication}\label{sec:OptimisticReplication}
 
 When replicated data needs to be shared efficiently in a wide-area network, optimistic replication is a preferable solution. The key difference between optimistic and pessimistic replication is the possibility to access and update replicas synchronously without locking the data. However this feature gives rise to new conflicts. If a piece of data is not locked, two or more operations can concurrently adjust the piece of data. This leads to inconsistent data and thus inconsistent replicas. The optimistic part of this algorithm is the assumption that these concurrent operations occur sporadically or will be easy to resolve. However, the impact of the concurrent operations depends on the application. \\
-\indent For example, when two users perform an operation on the same piece of date independently. The first user updates the data while the seconds user removes the data. Will the data been removed or been updated when the two operations are merged? The first one, often called 'lost-updates', causes the first user to lose his updates. The second possibility will undo the removal of the second user. This won't seem that complicated, however what will happen if three or more users perform an operation on the same piece of data? \\
+\indent For example, when two users perform an operation on the same piece of date independently. The first user updates the data while the secon user removes the data. Will the data been removed or been updated when the two operations are merged? The first one, often called 'lost-updates', causes the first user to lose his updates. The second possibility will undo the removal of the second user. This won't seem that complicated, however what will happen if three or more users perform an operation on the same piece of data? \\
 It is the role of consistency models to ensure that all the replicas, who have the possibility to temporarily differ from each other, converge to one single consistent state. Thus the replicas will be eventual consistent. Hence, optimistic replication is often referred as eventual consistency. Due the high availability of eventual consistent applications, the data can be, without first synchronizing, accessed and updated concurrently. This feature makes it possible to work with an unreliable or even without a connection. \\
 
 \subsection{Elements of Eventual Consistency}\label{sec:Elements}
@@ -292,6 +297,7 @@ Up to now, it is possible to use the application offline, without the possibilit
 
 %Bibliografie:
 
+%http://en.wikipedia.org/wiki/Distributed_computing#Properties_of_distributed_systems
 %cs.metrostate.edu/~fitzgesu/courses/ics662/spring10/Notes/SaitoSummary.htm
 %http://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed
 %https://www.cs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf
