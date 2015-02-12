@@ -12,6 +12,7 @@
 \usepackage[bottom]{footmisc}
 \usepackage{verbatim}
 
+
 % Code listings costumization
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codeblue}{rgb}{0,0,0.85}
@@ -67,11 +68,14 @@ requirements for the degree of Bachelor of Science in Computer Science}
 % Then english TitlePage
 \maketitlepage
 
+
 \tableofcontents
 \newpage
 
 \chapter{Introduction}\label{cha:Introduction} % 1
-%TODO
+
+
+
 \chapter{Context}\label{cha:Context} % 5
 
 This chapter includes an introduction to the main concepts of eventual consistency, also called optimistic replication. First, data replication is explained, which lies at the foundation of eventual consistency. Next, it is compared to the more traditional pessimistic replication, before elaborating on the elements that concern eventual consistency. Finally, some examples in which eventual consistency can be applied, are provided.
@@ -309,11 +313,28 @@ After the explanation of the various cloud data, it is time to consider the oper
 
 Up to now, it is possible to use the application offline, without the possibility of collaborating on one single list of birds. However the different cloud types are introduced, the data will not be shared between the different clients. This is where the synchronization model comes in. The model describes the synchronization mechanisms in detail in order to be able to implement the core of an offline available collaborative web application.\\
 \\
-The synchronization mechanism used in the Cloud Types model is very similar to the techniques used in a version control system, as seen in section~\ref{subsec:VCS}. Generally, the application consists out of multiple revisions. Each client maintains one single revision, while the server maintains the main revision. The clients can work on their revision, even when they are disconnected from the server. To acquire a new, up-to-date revision, one must \textit{fork} from the server. After performing the desired operations on the revision, the changes can be passed back by \textit{joining} with the main revision on the server. To give a structural overview of the different forks and joins that took place, revision diagrams are used. \\
+The synchronization mechanism used in the Cloud Types model is very similar to the techniques used in a version control system, as seen in section~\ref{subsec:VCS}. Generally, the application consists out of multiple revisions. Each client maintains one single revision, while the server maintains the main revision. The clients can work on their revision, even when they are disconnected from the server. To acquire a new, up-to-date revision, one must \textit{fork} from the server. After performing the desired operations on the revision, the changes can be passed back by \textit{joining} with the main revision on the server. To give a structural overview of the different forks and joins that took place, revision diagrams are used.\\
 \\
+In order to keep the developer as much as possible from the data synchronization, two, fairly similar, synchronization constructs are introduced. The first one is \textit{"Yield"}, while the second one is \textit{"Flush"}. In most cases, yield will be used over flush. Frequently calling this yield statement, will guarantee eventual consistency. However, if strong consistency is required, flush is the way to go. Due to the similarity between the two constructs, only yield will be explained.\\
+\\
+Yield in a non-blocking statement, which means it can be executed anytime, without blocking following statements. Opposed to flush, yield do not force synchronization, but only synchronizes with the main revision on the server if the client is connected. If the client is not connected to the server, yield will do nothing at all. Actually yield can perform three different operations, depending on the situation. These three cases are summarized below and correspond with the numbers in figure~\ref{fig:revisiondiagram}. 
 
-%Revision diagrams
-%Forking & joining (VCS)
+\begin{figure}
+    \vspace{-2,5cm}
+    \small
+    \centering
+    \includegraphics[scale=0.5]{revision-diagram.pdf}
+    \caption{A revision diagram clarifying the multiple cases of yield}
+    \label{fig:revisiondiagram}
+\end{figure}
+
+\begin{enumerate}
+    \item If the client is not expecting a response from the server, i.e. a fork, the client will join his local revision with the server. However, before sending the local revision, a fork is taken to allow the client to continue working on his local revision.
+    \item If the client received a fork from the server, the fork will be merged with the local revision of the client. In this case, the client will work with the most recent version of the main revision.
+    \item When the client expects a response from the server, but do not receive it because the client or server could be offline, yield will do nothing. This ensures that the client will not block while he is offline and can continue his execution process.
+\end{enumerate}
+
+It is up to the developer where he calls the yield statement. Generally, it will be part of an event loop to ensure it will be called repeatedly, in order to guarantee eventual consistency.
 
 \chapter{Conclusion}\label{cha:Conclusion} % 1
 
