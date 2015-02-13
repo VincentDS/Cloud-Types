@@ -74,11 +74,12 @@ requirements for the degree of Bachelor of Science in Computer Science}
 
 \chapter{Introduction}\label{cha:Introduction} % 1
 
-Today, online social networks and other collaborative applications, like Facebook, Office Online, etc. are a hot topic in the world of computer science. Actually, these systems are inseparable from our daily lives. However, these systems are dealing with two major drawbacks. The biggest disadvantage is the fact that almost any of these applications requires an Internet connection in order to work. Moreover, with the rise of the mobile devices, along with their less reliable connection, the problem is getting reinforced even more. A less severe drawback can be found in privacy concerns, where the owner of the system can access all your personalized data. Both characteristics are due to the centralized notion of the systems. \\
+Today, online social networks and other collaborative applications, like Facebook, Office Online, etc. are a hot topic in the world of computer science. Actually, these systems are inseparable from our daily lives. However, they are dealing with two major drawbacks. The biggest disadvantage is the fact that almost all of these applications require an Internet connection in order to work. Moreover, with the rise of mobile devices, along with their less reliable connection, this problem is getting more and more important. A less severe drawback can be found in privacy concerns, where the owner of the system can access all your personalized data. Both characteristics are due to the centralized notion of the systems. \\
 \\
-However, to solve these implications, the systems require a shift from a centralized view to a more distributed infrastructure. This allows the users to maintain their own data and work completely offline. Nonetheless, the complexity of the systems will grow strongly due to the necessity to replicate data over all the users, while inhibiting possible conflicts. \\
+Here, the focus primarily lies on the first characteristic, which is mainly due to the centralized notion of these systems. However, to solve this implication, a shift from a centralized view to a more distributed infrastructure is required. This allows the users to maintain their own data and work completely offline. Nonetheless, the complexity of the systems will grow strongly due to the necessity to replicate data over all the users, while inhibiting possible conflicts due to concurrent operations. \\
 \\
-To restrain developers with these complexities, S. Burckhardt introduced Cloud Types. In this preparatory, the model will be examined together with the concepts on which the model is based. This aims to clarify a specific implementation of Cloud Types, which is the topic of the next paper.
+To restrain developers with this complexity, S. Burckhardt introduced Cloud Types. In this preparatory, a general overview of different concepts and systems related to Cloud Types, followed by the model itself, are given. In chapter 2, the concept data replication will be explained, along with some applications as examples. Chapter 3 focuses on an important theorem and the current state of the art of the researched domain. Thereafter, the Cloud Types model will be examined in chapter 4. Finally, chapter 5 encompasses a little conclusion. \\
+All of this aims to clarify a specific implementation of Cloud Types, which is the topic of the next paper.
 
 \chapter{Context}\label{cha:Context} % 5
 
@@ -320,7 +321,7 @@ Up to now, it is possible to use the application offline, without the possibilit
 \\
 The synchronization mechanism used in the Cloud Types model is very similar to the techniques used in a version control system, as seen in section~\ref{subsec:VCS}. Generally, the application consists out of multiple revisions. Each client maintains one single revision, while the server maintains the main revision. The clients can work on their revision, even when they are disconnected from the server. To acquire a new, up-to-date revision, one must \textit{fork} from the server. After performing the desired operations on the revision, the changes can be passed back by \textit{joining} with the main revision on the server. To give a structural overview of the different forks and joins that took place, revision diagrams are used.\\
 \\
-In order to keep the developer as much as possible from the data synchronization, two, fairly similar, synchronization constructs are introduced. The first one is \textit{"Yield"}, while the second one is \textit{"Flush"}. In most cases, yield will be used over flush. Frequently calling this yield statement, will guarantee eventual consistency. However, if strong consistency is required, flush is the way to go. Due to the similarity between the two constructs, only yield will be explained.\\
+In order to protect the developer from the data synchronization as much as possible, two, fairly similar, synchronization constructs are introduced. The first one being \textit{"Yield"}, the second one \textit{"Flush"}. In most cases, yield will be used over flush. Frequently calling this yield statement, will guarantee eventual consistency. However, if strong consistency is required, flush is required. Due to the similarity between the two constructs, only yield will be explained.\\
 \\
 Yield in a non-blocking statement, which means it can be executed anytime, without blocking following statements. Opposed to flush, yield do not force synchronization, but only synchronizes with the main revision on the server if the client is connected. If the client is not connected to the server, yield will do nothing at all. Actually yield can perform three different operations, depending on the situation. These three cases are summarized below and correspond with the numbers in figure~\ref{fig:revisiondiagram}. 
 
@@ -329,14 +330,14 @@ Yield in a non-blocking statement, which means it can be executed anytime, witho
     \small
     \centering
     \includegraphics[scale=0.5]{revision-diagram.pdf}
-    \caption{A revision diagram clarifying the multiple cases of yield}
+    \caption{A revision diagram clarifying the multiple cases of yield, showing the timeline of two clients and the server. Outgoing arrows correspond with forks, while incoming arrows represent joins.}
     \label{fig:revisiondiagram}
 \end{figure}
 
 \begin{enumerate}
     \item If the client is not expecting a response from the server, i.e. a fork, the client will join his local revision with the server. However, before sending the local revision, a fork is taken to allow the client to continue working on his local revision.
     \item If the client received a fork from the server, the fork will be merged with the local revision of the client. In this case, the client will work with the most recent version of the main revision.
-    \item When the client expects a response from the server, but do not receive it because the client or server could be offline, yield will do nothing. This ensures that the client will not block while he is offline and can continue his execution process.
+    \item When the client expects a response from the server, but did not receive it because the client or server could be offline, or because of delay, yield will do nothing. This ensures that the client will not block while he is offline and can continue his execution process.
 \end{enumerate}
 
 It is up to the developer where he calls the yield statement. Generally, it will be part of an event loop to ensure it will be called repeatedly, in order to guarantee eventual consistency.
