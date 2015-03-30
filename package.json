@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/VincentDS/Eventual-Consistency/issues"
   },
-  "homepage": "https://github.com/VincentDS/Eventual-Consistency"
+  "homepage": "https://github.com/VincentDS/Eventual-Consistency",
+  "dependencies": {
+    "typescript": "^1.4.1"
+  }
 }
