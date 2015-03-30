@@ -1,20 +1,21 @@
-CloudType = require('CloudType');
+CloudType = require('./CloudType');
 
 
 //constructor
 function CloudInt(value) {
     this._value = value;
+    return this;
 }
 
 //inherits from CloudType
 CloudInt.prototype = Object.create(CloudType.prototype);
 
 //methods
-CloundInt.prototype.get = function() {
+CloudInt.prototype.get = function() {
     return this._value;
 }
 
-CloundInt.prototype.set = function(arg) {
+CloudInt.prototype.set = function(arg) {
     if (typeof arg == 'number') {
         this._value = arg;
         return this;
@@ -23,13 +24,13 @@ CloundInt.prototype.set = function(arg) {
         throw "argument must be a number"
 }
 
-CloundInt.prototype.add = function(arg) {
+CloudInt.prototype.add = function(arg) {
     if (typeof arg == 'number') {
         this._value += arg;
         return this;
     }
     else
-        throw "Argument must be a string"
+        throw "argument must be a number"
 }
 
 

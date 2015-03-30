@@ -3,6 +3,7 @@
 function CloudType (field, entry) {
     this._field = field;
     this._entry = entry;
+    return this;
 }
 
 //methods
