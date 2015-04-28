@@ -2,9 +2,8 @@ CloudType = require('./CloudType');
 
 
 //constructor
-function CloudString(value) {
-    //TODO: check if argument is correct type
-    this._value = value;
+function CloudString() {
+    this.value = '';
     return this;
 }
 
@@ -18,7 +17,7 @@ CloudString.prototype.get = function() {
 
 CloudString.prototype.set = function(arg) {
     if (typeof arg == 'string') {
-        this._value = arg;
+        this.value = arg;
         return this;
     }
     else
@@ -27,8 +26,8 @@ CloudString.prototype.set = function(arg) {
 
 CloudString.prototype.setIfEmpty = function(arg) {
     if (typeof arg == 'string') {
-        if(this._value == '') {
-            this._value = arg;
+        if(this.value == '') {
+            this.value = arg;
         }
         return this;
     }

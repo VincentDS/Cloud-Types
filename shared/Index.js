@@ -1,32 +1,28 @@
 Entry     = require('./Entry'),
-Validator = require('../lib/utils');
+Validator = require('../lib/utils'),
+Keys      = require('./Keys'),
+Fields    = require('./Fields');
 
 //constructor
 function Index(keys, fields) {
-    //TODO; check if valid fields
-    this.validKeys(keys);
-    //if (!Validator.validKeys(keys)) throw 'invalid keys';
-    //if (!Validator.validFields(fields)) throw 'invalid fields';
     this.tag = 'index';
-    this._keys = keys;
-    this._fields = fields;
+    this.keys = new Keys(keys);
+    this.fields = new Fields(fields);
     return this;
 }
 
-Index.prototype.get = function(keys) {
-    if (validKeys(keys)) {
-        return new Entry(this, keys);
+Index.prototype.get = function() {
+    var keyvalues = this.keys.keyValues(arguments)
+    if (keyvalues) {
+        return new Entry(this, keyvalues);
     } else
-        throw 'keys must be array of strings/numbers';
+        throw 'invalid keys';
 };
 
 Index.prototype.entries = function(key) {
     // body...
 };
 
-
-Index.prototype.validKeys = function(keys) {
-};
 
 
 module.exports = Index;

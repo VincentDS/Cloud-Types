@@ -2,9 +2,8 @@ CloudType = require('./CloudType');
 
 
 //constructor
-function CloudInt(value) {
-    //TODO: check if argument is correct type
-    this._value = value;
+function CloudInt() {
+    this.value = 0;
     return this;
 }
 
@@ -14,12 +13,12 @@ CloudInt.prototype = Object.create(CloudType.prototype);
 //methods
 CloudInt.prototype.get = function() {
     //helemaal naar boven gaan, entry, index, field. en uit field de juiste waarde halen door hash te maken van combinatie van deze velden
-    return this._value;
+    return this.value;
 }
 
 CloudInt.prototype.set = function(arg) {
     if (typeof arg == 'number') {
-        this._value = arg;
+        this.value = arg;
         return this;
     }
     else
@@ -28,7 +27,7 @@ CloudInt.prototype.set = function(arg) {
 
 CloudInt.prototype.add = function(arg) {
     if (typeof arg == 'number') {
-        this._value += arg;
+        this.value += arg;
         return this;
     }
     else
