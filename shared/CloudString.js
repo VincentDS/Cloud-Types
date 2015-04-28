@@ -2,8 +2,8 @@ CloudType = require('./CloudType');
 
 
 //constructor
-function CloudString() {
-    this.value = '';
+function CloudString(field, entry) {
+    CloudType.call(this, field, entry);
     return this;
 }
 
@@ -12,13 +12,12 @@ CloudString.prototype = Object.create(CloudType.prototype);
 
 //methods
 CloudString.prototype.get = function() {
-    return this._value;
+    return (this.getValue()) ? this.getValue() : '';
 }
 
 CloudString.prototype.set = function(arg) {
     if (typeof arg == 'string') {
-        this.value = arg;
-        return this;
+        (arg != '')? this.setValue(arg) : this.deleteEntry();
     }
     else
         throw "argument must be a string";
@@ -26,10 +25,7 @@ CloudString.prototype.set = function(arg) {
 
 CloudString.prototype.setIfEmpty = function(arg) {
     if (typeof arg == 'string') {
-        if(this.value == '') {
-            this.value = arg;
-        }
-        return this;
+        if (this.get() == '') this.set(arg);
     }
     else
         throw "argument must be a string";

@@ -2,8 +2,8 @@ CloudType = require('./CloudType');
 
 
 //constructor
-function CloudInt() {
-    this.value = 0;
+function CloudInt(field, entry) {
+    CloudType.call(this, field, entry);
     return this;
 }
 
@@ -12,14 +12,12 @@ CloudInt.prototype = Object.create(CloudType.prototype);
 
 //methods
 CloudInt.prototype.get = function() {
-    //helemaal naar boven gaan, entry, index, field. en uit field de juiste waarde halen door hash te maken van combinatie van deze velden
-    return this.value;
+    return (this.getValue()) ? this.getValue() : 0;
 }
 
 CloudInt.prototype.set = function(arg) {
     if (typeof arg == 'number') {
-        this.value = arg;
-        return this;
+        (arg != 0)? this.setValue(arg) : this.deleteEntry();
     }
     else
         throw "argument must be a number";
@@ -27,8 +25,8 @@ CloudInt.prototype.set = function(arg) {
 
 CloudInt.prototype.add = function(arg) {
     if (typeof arg == 'number') {
-        this.value += arg;
-        return this;
+        var result = this.get() + arg;
+        this.set(result);
     }
     else
         throw "argument must be a number";

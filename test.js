@@ -5,8 +5,9 @@ Index = require('./shared/Index');
 index = new Index([{name: 'string'}, {year: 'number'}], {amount: 'CInt', price : 'CInt', country : 'CString'})
 entry = index.get('apples', 1993);
 
-console.log(entry.key('name'));
+//console.log(entry.key('name'));
 
-cloudtype = entry.get('country');
+cloudtype = entry.get('amount');
 
-console.log(cloudtype);
+//console.log(cloudtype);
+cloudtype.get();

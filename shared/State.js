@@ -20,6 +20,8 @@ State.prototype.add = function(name, collection) {
         throw "A collection with this name already exists";
     } else {
         if (collection.tag == 'index' || collection.tag == 'table') {
+            //add state to the collection
+            collection.state = this;
             this.collections[name] = collection
             return collection
         } else

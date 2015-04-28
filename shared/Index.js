@@ -6,6 +6,7 @@ Fields    = require('./Fields');
 //constructor
 function Index(keys, fields) {
     this.tag = 'index';
+    this.state;
     this.keys = new Keys(keys);
     this.fields = new Fields(fields);
     return this;
