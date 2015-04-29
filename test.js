@@ -1,13 +1,5 @@
-Index = require('./shared/Index');
+CloudTypes = require('./client/Client');
 
 
-//[{name: 'string'}, {amount: 'number'}]
-index = new Index([{name: 'string'}, {year: 'number'}], {amount: 'CInt', price : 'CInt', country : 'CString'})
-entry = index.get('apples', 1993);
-
-//console.log(entry.key('name'));
-
-cloudtype = entry.get('amount');
-
-//console.log(cloudtype);
-cloudtype.get();
+var client = CloudTypes.Client;
+client.connect('http://localhost:8080');

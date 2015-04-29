@@ -18,9 +18,18 @@ Server.prototype.declare = function(name, collection) {
 };
 
 Server.prototype.start = function(port) {
+    that = this;
     port = (typeof port === 'undefined') ? 8080 : port;
     io.listen(port);
     console.log('Server running on port ' + port + '...');
+
+    io.on('connection', function (socket) {
+        console.log(that.state.toJSON);
+        console.log('Client connected!');
+
+        io.emit('init', JSON.stringify(that.state));
+    });
+
 };
 
 Server.prototype.stop = function() {
