@@ -24,10 +24,9 @@ Server.prototype.start = function(port) {
     console.log('Server running on port ' + port + '...');
 
     io.on('connection', function (socket) {
-        console.log(that.state.toJSON);
         console.log('Client connected!');
 
-        io.emit('init', JSON.stringify(that.state));
+        io.emit('init', JSON.stringify(that.state.serializable()));
     });
 
 };

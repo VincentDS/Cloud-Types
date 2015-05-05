@@ -12,4 +12,8 @@ Fields.prototype.fieldType = function(field) {
     }
 };
 
+ Fields.prototype.serializable = function() {
+    return this.fields;
+ };
+
 module.exports = Fields;

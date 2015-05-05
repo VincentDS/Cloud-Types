@@ -1,6 +1,7 @@
 //[{name: 'string'}, {amount: 'number'}]
 function Keys(keys) {
     var that = this;
+    this.keys = keys;
     this.names = [];
     this.types = [];
     keys.forEach(function(key) {
@@ -19,6 +20,11 @@ function Keys(keys) {
         res[this.names[i]] = arg[i];
     }
     return res;
+ };
+
+
+ Keys.prototype.serializable = function() {
+    return this.keys;
  };
 
 module.exports = Keys;

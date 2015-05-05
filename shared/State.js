@@ -29,6 +29,27 @@ State.prototype.add = function(name, collection) {
     }
 };
 
+State.prototype.serializable = function() {
+    var serializableIndexes = {};
+    for (var key in this.collections) {
+        serializableIndexes[key] = this.collections[key].serializable();
+    }
+    return {
+        fields: this.fields,
+        collections: serializableIndexes
+    }
+};
+
+State.deserializable = function(json) {
+    var state = new State();
+    var parsed = JSON.parse(json);
+    state.fields = parsed.fields;
+    Object.keys(parsed.collections).forEach(function(name) {
+        state.collections[name] = Index.deserializable(parsed.collections[name], state);
+    });
+    return state;
+}
+
 
 module.exports = State;
 

@@ -24,6 +24,19 @@ Index.prototype.entries = function(key) {
     // body...
 };
 
+Index.prototype.serializable = function() {
+    return {
+        keys: this.keys.serializable(),
+        fields: this.fields.serializable(),
+    }
+};
+
+Index.deserializable = function (json, state) {
+    var index = new Index(json.keys, json.fields);
+    index.state = state;
+    return index;
+}
+
 
 
 module.exports = Index;

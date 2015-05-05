@@ -10,8 +10,9 @@ Client.prototype.connect = function(url, callback) {
     socket.on('connect', function(){
         console.log('Connected with the server!');
 
-        socket.on('init', function (state) {
-            console.log(state);
+        socket.on('init', function (json) {
+            var state = State.deserializable(json)
+            callback(state);
         });
     });
 };
