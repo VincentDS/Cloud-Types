@@ -1,13 +1,12 @@
 Index = require('./Index');
 
-function State(stateManager) {
+function State() {
     this.tag = 'state';
     //hashmap fieldid to values
     this.fields = {};
     //collections dictionary (indexes/tables)
     this.collections = {};
-    //so everything in state can acquire the statemanager with the rounds
-    this.stateManager = stateManager
+    this.client = false;
 }
 
 State.prototype.get = function(name) {
@@ -42,8 +41,8 @@ State.prototype.serializable = function() {
     }
 };
 
-State.deserializable = function(json, stateManager) {
-    var state = new State(stateManager);
+State.deserializable = function(json) {
+    var state = new State();
     var parsed = JSON.parse(json);
     state.fields = parsed.fields;
     Object.keys(parsed.collections).forEach(function(name) {

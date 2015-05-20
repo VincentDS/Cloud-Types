@@ -11,7 +11,7 @@ server.declare('groceries', groceries);
 
 var apples = groceries.get('apples');
 var toBuy = apples.get('toBuy');
-toBuy.set(5);
+toBuy.setValue(5);
 
 
 server.start();
@@ -21,6 +21,14 @@ client.connect('http://localhost:8080', function(state) {
     var apples = groceries.get('apples');
     var toBuy = apples.get('toBuy');
     console.log(toBuy.get());
+
+    toBuy.add(9);
+    toBuy.add(3);
+    toBuy.add(10);
+    toBuy.add(50);
+    console.log(toBuy.get());
+    console.log(client.current.delta);
+
 });
 
 

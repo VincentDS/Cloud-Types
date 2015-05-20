@@ -1,10 +1,11 @@
 var io    = require('socket.io-client'),
     State = require('../shared/State'),
-    Round = require('../shared/Round'),
-    StateManager = require('../shared/StateManager');
+    Round = require('../shared/Round');
 
 function Client() {
-    this.stateManager = new StateManager();
+    this.state;
+    this.unconfirmed = [];
+    this.current =  new Round(this, 1);
     this.initiliazed =  false;
 }
 
@@ -14,10 +15,10 @@ Client.prototype.connect = function(url, callback) {
         console.log('Connected with the server!');
 
         socket.on('init', function (json) {
-            var state = State.deserializable(json, this.stateManager)
-            this.stateManager.state = state;
+            this.state = State.deserializable(json);
+            this.state.client = this;
             this.initiliazed = true;
-            callback(this.stateManager);
+            callback(this.state);
         }.bind(this));
 
 

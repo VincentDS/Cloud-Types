@@ -1,5 +1,4 @@
 _ = require('underscore');
-
 //constructor
 function CloudType(field, entry) {
     this.tag = 'cloudtype'
@@ -12,27 +11,7 @@ function CloudType(field, entry) {
 
     //privileged methods
     this.getValue = function() {
-        //get value of the cloudtype in the base
-        var basevalue =  (_.has(fields, fieldid)) ? fields[fieldid] : false;
-        var stateManager = this.entry.index.state.stateManager;
-
-        //we have to take the current en unconfirmed rounds into account.
-
-        var unconfirmedRounds = stateManager.unconfirmed
-        var unconfirmedValue = basevalue;
-
-        //update basevalue with operations in the unconfirmed rounds
-        unconfirmedRounds.forEach(function(round) {
-            unconfirmedValue = round.delta.apply(fieldid, unconfirmedValue);
-        })
-
-        //update previous value with the operations in the current round
-        var currentRound = stateManager.current
-        var confirmedValue = unconfirmedValue;
-        currentRound.delta.apply(fieldid, confirmedValue);
-
-        return confirmedValue;
-
+        return (_.has(fields, fieldid)) ? fields[fieldid] : false;
     }
 
     this.setValue = function(value) {
@@ -41,11 +20,38 @@ function CloudType(field, entry) {
     this.deleteEntry = function() {
         delete fields[fieldid];
     }
-    this.printFields = function() {
-        console.log(fields);
+
+    this.applyRounds = function() {
+        //get value of the cloudtype in the base
+        var basevalue =  (_.has(fields, fieldid)) ? fields[fieldid] : false;
+        var client = this.entry.index.state.client;
+
+        //we have to take the current en unconfirmed rounds into account.
+        var unconfirmedRounds = client.unconfirmed
+        var unconfirmedValue = basevalue;
+
+        //update basevalue with operations in the unconfirmed rounds
+        unconfirmedRounds.forEach(function(round) {
+            unconfirmedValue = round.delta.apply(fieldid, unconfirmedValue);
+        })
+
+        //update previous value with the operations in the current round
+        var currentRound = client.current
+        var confirmedValue = currentRound.delta.apply(fieldid, unconfirmedValue);
+
+        return confirmedValue;
     }
+
+    this.updateRound = function(operation) {
+        var curRound = this.entry.index.state.client.current;
+        curRound.delta.update(fieldid, operation);
+    }
+
 }
 
+CloudType.prototype.setValue = function(value) {
+        fields[fieldid] = value;
+    }
 
 //methods
 CloudType.prototype.isCloudType = function(CType) {

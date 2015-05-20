@@ -1,18 +1,16 @@
-var io    = require('socket.io')(),
-    StateManager = require('../shared/StateManager'),
-    Index = require('../shared/Index');
-
+var io      = require('socket.io')(),
+    LogTail = require('./LogTail');
 
 
 function Server() {
     this.io = io;
-    this.stateManager = new StateManager();
+    this.logtail = new LogTail();
 }
 
 
 Server.prototype.declare = function(name, collection) {
     if (collection.tag == 'index' || collection.tag == 'table') {
-        this.stateManager.state.add(name, collection);
+        this.logtail.state.add(name, collection);
     } else
         throw 'Invalid collection';
 };
@@ -26,7 +24,8 @@ Server.prototype.start = function(port) {
     io.on('connection', function (socket) {
         console.log('Client connected!');
 
-        io.emit('init', JSON.stringify(that.stateManager.state.serializable()));
+        //send state tot connected client
+        io.emit('init', JSON.stringify(that.logtail.state.serializable()));
     });
 
 };
