@@ -1,18 +1,18 @@
 var io    = require('socket.io')(),
-    State = require('../shared/State'),
+    StateManager = require('../shared/StateManager'),
     Index = require('../shared/Index');
 
 
 
 function Server() {
     this.io = io;
-    this.state = new State();
+    this.stateManager = new StateManager();
 }
 
 
 Server.prototype.declare = function(name, collection) {
     if (collection.tag == 'index' || collection.tag == 'table') {
-        this.state.add(name, collection);
+        this.stateManager.state.add(name, collection);
     } else
         throw 'Invalid collection';
 };
@@ -26,7 +26,7 @@ Server.prototype.start = function(port) {
     io.on('connection', function (socket) {
         console.log('Client connected!');
 
-        io.emit('init', JSON.stringify(that.state.serializable()));
+        io.emit('init', JSON.stringify(that.stateManager.state.serializable()));
     });
 
 };

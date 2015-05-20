@@ -12,8 +12,29 @@ function CloudType(field, entry) {
 
     //privileged methods
     this.getValue = function() {
-        return (_.has(fields, fieldid)) ? fields[fieldid] : false;
+        //get value of the cloudtype in the base
+        var basevalue =  (_.has(fields, fieldid)) ? fields[fieldid] : false;
+        var stateManager = this.entry.index.state.stateManager;
+
+        //we have to take the current en unconfirmed rounds into account.
+
+        var unconfirmedRounds = stateManager.unconfirmed
+        var unconfirmedValue = basevalue;
+
+        //update basevalue with operations in the unconfirmed rounds
+        unconfirmedRounds.forEach(function(round) {
+            unconfirmedValue = round.delta.apply(fieldid, unconfirmedValue);
+        })
+
+        //update previous value with the operations in the current round
+        var currentRound = stateManager.current
+        var confirmedValue = unconfirmedValue;
+        currentRound.delta.apply(fieldid, confirmedValue);
+
+        return confirmedValue;
+
     }
+
     this.setValue = function(value) {
         fields[fieldid] = value;
     }
@@ -25,11 +46,11 @@ function CloudType(field, entry) {
     }
 }
 
+
 //methods
 CloudType.prototype.isCloudType = function(CType) {
     return (CType.tag == 'cloudtype');
 }
-
 
 
 module.exports = CloudType;

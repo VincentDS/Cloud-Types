@@ -12,7 +12,8 @@ CloudString.prototype = Object.create(CloudType.prototype);
 
 //methods
 CloudString.prototype.get = function() {
-    return (this.getValue()) ? this.getValue() : '';
+    var value = this.getValue();
+    return (value) ? value : '';
 }
 
 CloudString.prototype.set = function(arg) {

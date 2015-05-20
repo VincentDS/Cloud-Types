@@ -1,5 +1,4 @@
 Entry     = require('./Entry'),
-Validator = require('../lib/utils'),
 Keys      = require('./Keys'),
 Fields    = require('./Fields');
 

@@ -12,7 +12,8 @@ CloudInt.prototype = Object.create(CloudType.prototype);
 
 //methods
 CloudInt.prototype.get = function() {
-    return (this.getValue()) ? this.getValue() : 0;
+    var value =  this.getValue();
+    return (value) ? value : 0;
 }
 
 CloudInt.prototype.set = function(arg) {

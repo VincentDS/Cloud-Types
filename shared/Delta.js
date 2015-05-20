@@ -7,6 +7,7 @@ function Delta() {
     this.updated = {};
 }
 
+//updates on the delta object
 Delta.prototype.update = function(key, operation) {
     if (operation.tag !== 'operation') throw 'invalid operation';
     if (!(key in this.updated)) {
@@ -27,6 +28,24 @@ Delta.prototype.update = function(key, operation) {
                 break;
         }
     }
+};
+
+//apply the delta object on a specific value
+Delta.prototype.apply = function(key, value) {
+    if (key in this.updated) {
+        console.log('key found in this delta!');
+        var operation = this.updated[key];
+        switch(operation.operator) {
+            case 'set':
+                value = operation.value;
+                break;
+            case 'add':
+                value += operation.value;
+                break;
+        }
+
+    }
+    return value;
 };
 
 module.exports = Delta;
