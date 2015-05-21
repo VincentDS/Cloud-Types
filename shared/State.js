@@ -30,6 +30,13 @@ State.prototype.add = function(name, collection) {
     }
 };
 
+//apply a delta on the state
+State.prototype.apply = function(delta) {
+    for (var key in this.fields) {
+        this.fields[key] = delta.apply(key, this.fields[key]);
+    }
+};
+
 State.prototype.serializable = function() {
     var serializableIndexes = {};
     for (var key in this.collections) {

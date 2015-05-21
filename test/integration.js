@@ -13,8 +13,9 @@ var apples = groceries.get('apples');
 var toBuy = apples.get('toBuy');
 toBuy.setValue(5);
 
-
 server.start();
+
+console.log(server.logTail.state)
 
 client.connect('http://localhost:8080', function(state) {
     var groceries = state.get('groceries');
@@ -27,8 +28,28 @@ client.connect('http://localhost:8080', function(state) {
     toBuy.add(10);
     toBuy.add(50);
     console.log(toBuy.get());
-    console.log(client.current.delta);
+
+    client.yield();
 
 });
 
+
+client.connect('http://localhost:8080', function(state) {
+    var groceries = state.get('groceries');
+    var apples = groceries.get('apples');
+    var toBuy = apples.get('toBuy');
+    console.log(toBuy.get());
+
+    toBuy.add(30);
+    toBuy.add(2);
+    toBuy.add(100);
+    toBuy.add(76);
+    console.log(toBuy.get());
+
+    client.yield();
+
+});
+
+
+setTimeout(function() {console.log(server.logTail.state)}, 3000)
 

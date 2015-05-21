@@ -1,4 +1,4 @@
-Delta = require('./Delta');
+Delta = require('../shared/Delta');
 
 function LogSegment() {
     this.maxround = {}
@@ -6,7 +6,8 @@ function LogSegment() {
 }
 
 LogSegment.prototype.append = function(round) {
-    // body...
+    this.maxround[round.client] = round.number;
+    this.delta.append(round.delta);
 };
 
 module.exports = LogSegment;
