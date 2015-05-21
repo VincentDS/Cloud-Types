@@ -5,7 +5,7 @@ CClient = require('../client/Client');
 
 
 var server = CServer.Server;
-var client = CClient.Client;
+var client = new CClient.Client();
 
 
 describe('Integration', function(){

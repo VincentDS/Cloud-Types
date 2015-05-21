@@ -37,7 +37,6 @@ function Client() {
 Client.prototype.connect = function(url, callback) {
     this.socket = io.connect(url, {'forceNew': true });
     this.socket.on('connect', function() {
-        console.log(this.socket.id + ', ' +  this.id);
 
         if (!this.id)  {
             //console.log('First connection with the server!');
