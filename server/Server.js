@@ -43,7 +43,13 @@ Server.prototype.start = function(port) {
 
         //send state tot connected client
         socket.on('init', function (initClient) {
+            console.log('initClient');
             initClient({id: ++this.clientcount, state: JSON.stringify(this.logTail.state.serializable())});
+        }.bind(this));
+
+        //send state tot connected client
+        socket.on('reconnection', function (reconnectClient) {
+            reconnectClient({state: JSON.stringify(this.logTail.state.serializable())})
         }.bind(this));
 
         socket.on('yield', function (round) {

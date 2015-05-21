@@ -24,24 +24,27 @@ function Client() {
 }
 
 Client.prototype.connect = function(url, callback) {
-    this.socket = io(url);
-    this.socket.on('connect', function(){
+    this.socket = io.connect(url, {'forceNew': true });
+    this.socket.on('connect', function() {
 
-    if (!this.id)  {
-        console.log('First connection with the server!');
-        this.socket.emit('init', function (init) {
-            this.id = init.id;
-            this.current =  new Round(this.id, 1);
-            this.state = State.deserializable(init.state);
-            this.state.client = this;
-            this.initiliazed = true;
-            callback(this.state);
-        }.bind(this));
-    }
-
-    if (this.id) {
-        console.log('Already has been connected to the server');
-    }
+        if (!this.id)  {
+            console.log('First connection with the server!');
+            this.socket.emit('init', function (init) {
+                this.id = init.id;
+                this.current =  new Round(this.id, 1);
+                this.state = State.deserializable(init.state);
+                this.state.client = this;
+                this.initiliazed = true;
+                callback(this.state);
+            }.bind(this));
+        } else {
+            console.log('Already has been connected to the server');
+            this.socket.emit('reconnection', function (reconnect) {
+                this.state = State.deserializable(reconnect.state);
+                this.state.client = this;
+                callback(this.state);
+            }.bind(this));
+        }
 
 
     }.bind(this));
@@ -54,7 +57,9 @@ Client.prototype.yield = function() {
     };
 };
 
-
+Client.prototype.disconnect = function() {
+    this.socket.disconnect();
+};
 
 
 
