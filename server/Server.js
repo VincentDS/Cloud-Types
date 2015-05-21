@@ -1,6 +1,7 @@
 var io      = require('socket.io')(),
     LogTail = require('./LogTail'),
-    LogSegment = require('./LogSegment');
+    LogSegment = require('./LogSegment'),
+    Round = require('../shared/Round');
 
 
 function Server() {
@@ -11,13 +12,18 @@ function Server() {
 
     this.receiveRound = function(round) {
         this.curSegment.append(round);
-        //console.log(this.curSegment);
     }
 
     this.processSegment = function() {
-        console.log('processing LogSegment...');
-        this.logTail.apply(this.curSegment);
-        this.curSegment = new LogSegment();
+        if (!this.curSegment.isEmpty()) {
+            console.log('processing current segment...');
+            this.logTail.apply(this.curSegment);
+            //broadcast processed segment to all the connected clients
+            io.sockets.emit('update', JSON.stringify(this.curSegment.serializable()));
+            this.curSegment = new LogSegment();
+        } else {
+            console.log('empty current segment..');
+        }
     }
 
     setInterval(this.processSegment.bind(this), 2000);
@@ -39,20 +45,20 @@ Server.prototype.start = function(port) {
     console.log('Server running on port ' + port + '...');
 
     io.on('connection', function (socket) {
-        console.log('Client connected!');
+        //console.log('Client connected!');
 
         //send state tot connected client
         socket.on('init', function (initClient) {
-            console.log('initClient');
             initClient({id: ++this.clientcount, state: JSON.stringify(this.logTail.state.serializable())});
         }.bind(this));
 
         //send state tot connected client
         socket.on('reconnection', function (reconnectClient) {
-            reconnectClient({state: JSON.stringify(this.logTail.state.serializable())})
+            reconnectClient({state: JSON.stringify(this.logTail.state.serializable())});
         }.bind(this));
 
-        socket.on('yield', function (round) {
+        socket.on('yield', function (receiveRound) {
+            var round = Round.deserializable(receiveRound.round);
             console.log('server received round from client ' + round.client);
             this.receiveRound(round)
         }.bind(this));

@@ -55,4 +55,23 @@ Delta.prototype.append = function(delta) {
     }
 };
 
+Delta.prototype.serializable = function() {
+    var serializableOperations = {};
+    for (var key in this.updated) {
+        serializableOperations[key] = this.updated[key].serializable();
+    }
+    return {
+        updated: serializableOperations,
+    }
+};
+
+Delta.deserializable = function(json) {
+    var delta = new Delta();
+    var parsed = json //JSON.parse(json);
+    Object.keys(parsed.updated).forEach(function(key) {
+        delta.updated[key] = Operation.deserializable(parsed.updated[key]);
+    });
+    return delta;
+}
+
 module.exports = Delta;
