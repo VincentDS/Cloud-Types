@@ -54,10 +54,10 @@ Server.prototype.start = function(port) {
 
         //send state tot connected client
         socket.on('reconnection', function (reconnectClient) {
-            reconnectClient({state: JSON.stringify(this.logTail.state.serializable())});
+            reconnectClient({logtail: JSON.stringify(this.logTail.serializable())});
         }.bind(this));
 
-        socket.on('yield', function (receiveRound) {
+        socket.on('round', function (receiveRound) {
             var round = Round.deserializable(receiveRound.round);
             //console.log('server received round from client ' + round.client);
             this.receiveRound(round)

@@ -1,7 +1,8 @@
 var io    = require('socket.io-client'),
     State = require('../shared/State'),
     Round = require('../shared/Round'),
-    LogSegment = require('../server/LogSegment');
+    LogSegment = require('../server/LogSegment'),
+    LogTail = require('../server/LogTail');
 
 function Client() {
     this.id;
@@ -13,7 +14,7 @@ function Client() {
 
     this.commit = function() {
         //send current to the server
-         this.socket.emit('yield', {round: JSON.stringify(this.current.serializable())})
+         this.socket.emit('round', {round: JSON.stringify(this.current.serializable())})
 
         //add current to unconfirmed rounds
         this.unconfirmed.push(this.current)
@@ -28,6 +29,12 @@ function Client() {
             this.unconfirmed.shift();
         }
         //console.log(this.state);
+    }
+
+    this.resendUnconfirmed = function() {
+        this.unconfirmed.forEach(function (round) {
+            this.socket.emit('round', {round: JSON.stringify(round.serializable())})
+        })
     }
 }
 
@@ -48,8 +55,14 @@ Client.prototype.connect = function(url, callback) {
         } else {
             //console.log('Already has been connected to the server');
             this.socket.emit('reconnection', function (reconnect) {
-                this.state = State.deserializable(reconnect.state);
+                var logTail = LogTail.deserializable(reconnect.logtail);
+                //replace base state
+                this.state = logTail.state
                 this.state.client = this;
+                //delete unconfirmed rounds that are already part of the logtail
+                this.adjustConfirmed(logTail.maxround[this.id]);
+                //resend unconfirmed rounds
+                this.resendUnconfirmed();
                 callback(this.state);
             }.bind(this));
         }
