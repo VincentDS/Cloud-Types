@@ -16,6 +16,7 @@ describe('Integration', function(){
         server.stop();
     });
 
+
     describe('Server API', function(){
 
         var index = new CServer.Index([{name: 'string'}], {toBuy: 'CInt', country: 'CString'});
@@ -115,6 +116,43 @@ describe('Integration', function(){
                     }, 3000)
                 });
             });
+        })
+
+        it('offline availability, reconnecting and sending changes', function(done) {
+            this.timeout(5000);
+            var client = new CClient.Client();
+            var initialState;
+            client.connect('http://localhost:8080', function(state) {
+                initialState = state;
+                client.socket.connected.should.be.true;
+                //disconnect client
+                client.disconnect();
+                client.socket.connected.should.be.false;
+
+                var index = state.get('groceries');
+                var entry = index.get('apples');
+                var cloudint = entry.get('toBuy');
+                cloudint.get().should.be.equal(50);
+                cloudint.add(15);
+                //try to yield
+                client.yield();
+
+                //base value of server must still be the same
+                _.isEqual(initialState, state).should.be.true;
+
+                //reconnect to the server
+                client.connect('http://localhost:8080', function(state) {
+                    client.yield();
+                    //wait for server to process the round
+                    setTimeout(function () {
+                        //check base value of client
+                        state.get('groceries').get('apples').get('toBuy').getValue().should.be.equal(65);
+                        done();
+                    }, 3000)
+                })
+            });
+            //onsole.log(client.state);
+
         })
 
     })

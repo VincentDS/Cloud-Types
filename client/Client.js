@@ -14,7 +14,7 @@ function Client() {
 
     this.commit = function() {
         //send current to the server
-         this.socket.emit('round', {round: JSON.stringify(this.current.serializable())})
+        this.socket.emit('round', {round: JSON.stringify(this.current.serializable())})
 
         //add current to unconfirmed rounds
         this.unconfirmed.push(this.current)
@@ -84,7 +84,9 @@ Client.prototype.connect = function(url, callback) {
 Client.prototype.yield = function() {
     if (this.socket.connected) {
         this.commit();
-    };
+    } else {
+        //console.log('client is disconnected from the server..');
+    }
 };
 
 Client.prototype.disconnect = function() {

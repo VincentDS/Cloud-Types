@@ -16,7 +16,6 @@ function Server() {
 
     this.processSegment = function() {
         if (!this.curSegment.isEmpty()) {
-            //console.log('processing current segment...');
             this.logTail.apply(this.curSegment);
             //broadcast processed segment to all the connected clients
             io.sockets.emit('update', JSON.stringify(this.curSegment.serializable()));
