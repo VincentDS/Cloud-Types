@@ -24,11 +24,8 @@ function Client() {
     this.adjustConfirmed = function(maximum) {
 
         //delete all rounds in unconfirmed until the maximum number
-        while (maximum >= this.unconfirmed[0].number) {
+        while (this.unconfirmed.length !== 0 && maximum >= this.unconfirmed[0].number) {
             this.unconfirmed.shift();
-            if (this.unconfirmed.length == 0) {
-                break;
-            }
         }
         //console.log(this.state);
     }
@@ -59,7 +56,7 @@ Client.prototype.connect = function(url, callback) {
 
         this.socket.on('update', function (logSegment) {
             var logSegment = LogSegment.deserializable(logSegment);
-            console.log('client ' + this.id + ' received segment : ' + logSegment);
+            //console.log('client ' + this.id + ' received segment : ' + logSegment);
             //apply delta of logsegment to the client's base
             this.state.apply(logSegment.delta);
             //delete unconfirmed rounds that are part of this logsegment

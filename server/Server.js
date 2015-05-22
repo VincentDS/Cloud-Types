@@ -16,13 +16,13 @@ function Server() {
 
     this.processSegment = function() {
         if (!this.curSegment.isEmpty()) {
-            console.log('processing current segment...');
+            //console.log('processing current segment...');
             this.logTail.apply(this.curSegment);
             //broadcast processed segment to all the connected clients
             io.sockets.emit('update', JSON.stringify(this.curSegment.serializable()));
             this.curSegment = new LogSegment();
         } else {
-            console.log('empty current segment..');
+            //console.log('empty current segment..');
         }
     }
 
@@ -59,7 +59,7 @@ Server.prototype.start = function(port) {
 
         socket.on('yield', function (receiveRound) {
             var round = Round.deserializable(receiveRound.round);
-            console.log('server received round from client ' + round.client);
+            //console.log('server received round from client ' + round.client);
             this.receiveRound(round)
         }.bind(this));
 
