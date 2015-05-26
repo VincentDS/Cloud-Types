@@ -134,7 +134,7 @@ describe('Integration', function(){
                 var cloudint = entry.get('toBuy');
                 cloudint.get().should.be.equal(50);
                 cloudint.add(15);
-                //try to yield
+                //try to yield, while offline (does nothing)
                 client.yield();
 
                 //base value of server must still be the same
@@ -174,12 +174,15 @@ describe('Integration', function(){
 
                     cloudint2.add(10);
                     client2.yield();
+                    //client2 yielding and sending changes to the server so client1 receives it
                     setTimeout(function () {
+                        //client1 may not process the changes of client2 yet
                         cloudint1.get().should.be.equal(5);
 
                         //**...and this yield
                         client1.yield();
 
+                        //after the yield, client1 must have the change of client2
                         cloudint1.get().should.be.equal(15);
                         done();
                     }, 3000)
