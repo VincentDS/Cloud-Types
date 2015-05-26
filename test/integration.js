@@ -151,7 +151,6 @@ describe('Integration', function(){
                     }, 3000)
                 })
             });
-            //onsole.log(client.state);
 
         })
 

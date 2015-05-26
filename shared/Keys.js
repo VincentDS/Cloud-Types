@@ -6,9 +6,9 @@ function Keys(keys) {
     this.types = [];
     keys.forEach(function(key) {
         subkey = Object.keys(key)[0];
-        that.names.push(subkey);
-        that.types.push(key[subkey]);
-    })
+        this.names.push(subkey);
+        this.types.push(key[subkey]);
+    }.bind(this))
 }
 
 //expects multiple parameters
