@@ -4,7 +4,7 @@ var io    = require('socket.io-client'),
     LogSegment = require('../server/LogSegment'),
     LogTail = require('../server/LogTail');
 
-function Client(liveUpdate) {
+function Client(yieldUpdate) {
     this.id;
     this.state;
     this.unconfirmed = [];
@@ -12,7 +12,7 @@ function Client(liveUpdate) {
     this.current;
     this.initiliazed =  false;
     this.socket;
-    this.liveUpdate = liveUpdate;
+    this.yieldUpdate = yieldUpdate;
 
     this.commit = function() {
         //send current to the server
@@ -85,7 +85,7 @@ Client.prototype.connect = function(url, callback) {
             //console.log('client ' + this.id + ' received segment : ' + logSegment);
             //add logsegment to the received logsegment list
             this.received.push(logSegment);
-            if (this.liveUpdate) {
+            if (!this.yieldUpdate) {
                 //process received logsegments
                 this.processSegments();
             }
@@ -100,7 +100,7 @@ Client.prototype.yield = function() {
     if (this.socket.connected) {
         //commit current round
         this.commit();
-        if (!this.liveUpdate) {
+        if (this.yieldUpdate) {
             //process received logsegments
             this.processSegments();
         }
