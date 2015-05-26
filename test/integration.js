@@ -39,7 +39,7 @@ describe('Integration', function(){
 
     describe('Client API', function(){
 
-        var client = new CClient.Client();
+        var client = new CClient.Client(true);
         it('connecting to the server', function(done){
             client.connect('http://localhost:8080', function(state) {
                 client.socket.connected.should.be.true
@@ -68,7 +68,7 @@ describe('Integration', function(){
 
         it('yielding with one client', function(done){
             this.timeout(5000);
-            var client = new CClient.Client();
+            var client = new CClient.Client(true);
             client.connect('http://localhost:8080', function(state) {
                 var index = state.get('groceries');
                 var entry = index.get('apples');
@@ -90,8 +90,8 @@ describe('Integration', function(){
 
         it('yielding with two clients', function(done){
             this.timeout(10000);
-            var client1 = new CClient.Client();
-            var client2 = new CClient.Client();
+            var client1 = new CClient.Client(true);
+            var client2 = new CClient.Client(true);
             client1.connect('http://localhost:8080', function(state1) {
                 var index1 = state1.get('groceries');
                 var entry1 = index1.get('apples');
@@ -120,7 +120,7 @@ describe('Integration', function(){
 
         it('offline availability, reconnecting and sending changes', function(done) {
             this.timeout(5000);
-            var client = new CClient.Client();
+            var client = new CClient.Client(true);
             var initialState;
             client.connect('http://localhost:8080', function(state) {
                 initialState = state;

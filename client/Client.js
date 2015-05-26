@@ -4,13 +4,15 @@ var io    = require('socket.io-client'),
     LogSegment = require('../server/LogSegment'),
     LogTail = require('../server/LogTail');
 
-function Client() {
+function Client(liveUpdate) {
     this.id;
     this.state;
     this.unconfirmed = [];
+    this.received = [];
     this.current;
     this.initiliazed =  false;
     this.socket;
+    this.liveUpdate = liveUpdate;
 
     this.commit = function() {
         //send current to the server
@@ -36,13 +38,24 @@ function Client() {
             this.socket.emit('round', {round: JSON.stringify(round.serializable())})
         })
     }
+
+    this.processSegments = function() {
+        this.received.forEach(function(logSegment) {
+            //apply delta of logsegment to the client's base
+            this.state.apply(logSegment.delta);
+            //delete unconfirmed rounds that are part of this logsegment
+            this.adjustConfirmed(logSegment.maxround[this.id]);
+        }.bind(this));
+        //All logsments have been processed, empty the array
+        this.received = []
+    }
 }
 
 Client.prototype.connect = function(url, callback) {
     this.socket = io.connect(url, {'forceNew': true });
     this.socket.on('connect', function() {
 
-        if (!this.id)  {
+        if (!this.initiliazed)  {
             //console.log('First connection with the server!');
             this.socket.emit('init', function (init) {
                 this.id = init.id;
@@ -70,10 +83,12 @@ Client.prototype.connect = function(url, callback) {
         this.socket.on('update', function (logSegment) {
             var logSegment = LogSegment.deserializable(logSegment);
             //console.log('client ' + this.id + ' received segment : ' + logSegment);
-            //apply delta of logsegment to the client's base
-            this.state.apply(logSegment.delta);
-            //delete unconfirmed rounds that are part of this logsegment
-            this.adjustConfirmed(logSegment.maxround[this.id]);
+            //add logsegment to the received logsegment list
+            this.received.push(logSegment);
+            if (this.liveUpdate) {
+                //process received logsegments
+                this.processSegments();
+            }
         }.bind(this));
 
 
@@ -83,7 +98,12 @@ Client.prototype.connect = function(url, callback) {
 //yield commits the current and receives and receives logsegments form the server
 Client.prototype.yield = function() {
     if (this.socket.connected) {
+        //commit current round
         this.commit();
+        if (!this.liveUpdate) {
+            //process received logsegments
+            this.processSegments();
+        }
     } else {
         //console.log('client is disconnected from the server..');
     }
