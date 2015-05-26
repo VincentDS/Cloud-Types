@@ -39,7 +39,7 @@ describe('Integration', function(){
 
     describe('Client API', function(){
 
-        var client = new CClient.Client(true);
+        var client = new CClient.Client(false);
         it('connecting to the server', function(done){
             client.connect('http://localhost:8080', function(state) {
                 client.socket.connected.should.be.true
@@ -68,7 +68,7 @@ describe('Integration', function(){
 
         it('yielding with one client', function(done){
             this.timeout(5000);
-            var client = new CClient.Client(true);
+            var client = new CClient.Client(false);
             client.connect('http://localhost:8080', function(state) {
                 var index = state.get('groceries');
                 var entry = index.get('apples');
@@ -90,8 +90,8 @@ describe('Integration', function(){
 
         it('yielding with two clients', function(done){
             this.timeout(10000);
-            var client1 = new CClient.Client(true);
-            var client2 = new CClient.Client(true);
+            var client1 = new CClient.Client(false);
+            var client2 = new CClient.Client(false);
             client1.connect('http://localhost:8080', function(state1) {
                 var index1 = state1.get('groceries');
                 var entry1 = index1.get('apples');
@@ -120,7 +120,7 @@ describe('Integration', function(){
 
         it('offline availability, reconnecting and sending changes', function(done) {
             this.timeout(5000);
-            var client = new CClient.Client(true);
+            var client = new CClient.Client(false);
             var initialState;
             client.connect('http://localhost:8080', function(state) {
                 initialState = state;
@@ -150,6 +150,40 @@ describe('Integration', function(){
                         done();
                     }, 3000)
                 })
+            });
+
+        })
+
+        it('Using \'yieldUpdate\', only update state when yielding. State between two yields is guaranteed to be consistent', function(done) {
+            this.timeout(5000);
+            var client1 = new CClient.Client(true);
+            var client2 = new CClient.Client(false);
+            client1.connect('http://localhost:8080', function(state1) {
+                var index1 = state1.get('groceries');
+                var entry1 = index1.get('apples');
+                var cloudint1 = entry1.get('toBuy');
+                cloudint1.set(5);
+
+                //state must be consistent between this yield...**
+                client1.yield();
+
+                client2.connect('http://localhost:8080', function(state2) {
+                    var index2 = state2.get('groceries');
+                    var entry2 = index2.get('apples');
+                    var cloudint2 = entry2.get('toBuy');
+
+                    cloudint2.add(10);
+                    client2.yield();
+                    setTimeout(function () {
+                        cloudint1.get().should.be.equal(5);
+
+                        //**...and this yield
+                        client1.yield();
+
+                        cloudint1.get().should.be.equal(15);
+                        done();
+                    }, 3000)
+                });
             });
 
         })
