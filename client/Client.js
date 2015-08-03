@@ -14,7 +14,7 @@ function Client(yieldUpdate) {
     this.socket;
     this.yieldUpdate = yieldUpdate;
 
-    this.commit = function() {
+    this.commit = function(cb) {
         //send current to the server
         this.socket.emit('round', {round: JSON.stringify(this.current.serializable())})
 
@@ -22,6 +22,11 @@ function Client(yieldUpdate) {
         this.unconfirmed.push(this.current)
         //refresh current round
         this.current = new Round(this.id, this.current.number+1)
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+
     };
 
     this.adjustConfirmed = function(maximum) {
@@ -39,15 +44,28 @@ function Client(yieldUpdate) {
         })
     }
 
-    this.processSegments = function() {
+    this.processSegments = function (roundnumber, cb) {
         this.received.forEach(function(logSegment) {
             //apply delta of logsegment to the client's base
             this.state.apply(logSegment.delta);
+            maxRound = logSegment.maxround[this.id];
             //delete unconfirmed rounds that are part of this logsegment
-            this.adjustConfirmed(logSegment.maxround[this.id]);
+            this.adjustConfirmed(maxRound);
         }.bind(this));
-        //All logsments have been processed, empty the array
+        //All logsegments have been processed, empty the array (forEach is synchronous)
         this.received = []
+
+        //for flushing
+        if (typeof cb === 'function') {
+            //check if commited round is processed by the server and sent back
+            if (typeof maxRound === 'undefined' || roundnumber > maxRound) {
+                //no? try again until the round is processed and sent back
+                setTimeout(this.processSegments.bind(this), 500, roundnumber, cb);
+            } else {
+                //round is processed and sent back
+                cb();
+            }
+        }
     }
 }
 
@@ -107,6 +125,16 @@ Client.prototype.yield = function() {
     } else {
         //console.log('client is disconnected from the server..');
     }
+};
+
+Client.prototype.flush = function(callback) {
+    var roundNumber = this.current.number;
+    //commit round and wait until server sends the processed round back
+    this.commit(function() {
+        this.processSegments(roundNumber, function() {
+            callback();
+        });
+    }.bind(this));
 };
 
 Client.prototype.disconnect = function() {

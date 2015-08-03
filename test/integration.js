@@ -67,7 +67,7 @@ describe('Integration', function(){
             });
         })
 
-        it('testing cloudstrings', function(done){
+        it.skip('testing cloudstrings', function(done){
             var client = new CClient.Client(false);
             client.connect('http://localhost:8080', function(state) {
                 var value1 = 'belgium';
@@ -85,7 +85,7 @@ describe('Integration', function(){
             })
         })
 
-        it('yielding with one client', function(done){
+        it.skip('yielding with one client', function(done){
             this.timeout(5000);
             var client = new CClient.Client(false);
             client.connect('http://localhost:8080', function(state) {
@@ -205,6 +205,24 @@ describe('Integration', function(){
                         cloudint1.get().should.be.equal(15);
                         done();
                     }, 3000)
+                });
+            });
+
+        })
+
+
+        it('flushing', function(done) {
+            this.timeout(3000);
+            var client = new CClient.Client(true);
+            client.connect('http://localhost:8080', function(state) {
+                var index = state.get('groceries');
+                var entry = index.get('apples');
+                var cloudint = entry.get('toBuy');
+                cloudint.set(100);
+                cloudint.getValue().should.not.be.equal(100);
+                client.flush(function() {
+                    cloudint.get().should.be.equal(100);
+                    done();
                 });
             });
 
