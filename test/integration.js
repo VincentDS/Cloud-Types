@@ -35,6 +35,7 @@ describe('Integration', function(){
             cloudint.getValue().should.equal(value);
         })
 
+
     })
 
     describe('Client API', function(){
@@ -66,6 +67,24 @@ describe('Integration', function(){
             });
         })
 
+        it('testing cloudstrings', function(done){
+            var client = new CClient.Client(false);
+            client.connect('http://localhost:8080', function(state) {
+                var value1 = 'belgium';
+                var value2 = 'france';
+                var index = state.get('groceries');
+                var entry = index.get('apples');
+                var cloudstring = entry.get('country');
+                cloudstring.set(value1);
+                cloudstring.get().should.equal(value1);
+                cloudstring.setIfEmpty(value2);
+                cloudstring.get().should.equal(value1);
+                cloudstring.set(value2);
+                cloudstring.get().should.equal(value2);
+                done();
+            })
+        })
+
         it('yielding with one client', function(done){
             this.timeout(5000);
             var client = new CClient.Client(false);
@@ -88,7 +107,7 @@ describe('Integration', function(){
             });
         })
 
-        it('yielding with two clients', function(done){
+        it.skip('yielding with two clients', function(done){
             this.timeout(10000);
             var client1 = new CClient.Client(false);
             var client2 = new CClient.Client(false);
@@ -118,7 +137,7 @@ describe('Integration', function(){
             });
         })
 
-        it('offline availability, reconnecting and sending changes', function(done) {
+        it.skip('offline availability, reconnecting and sending changes', function(done) {
             this.timeout(5000);
             var client = new CClient.Client(false);
             var initialState;
@@ -154,7 +173,7 @@ describe('Integration', function(){
 
         })
 
-        it('Using \'yieldUpdate\', only update state when yielding. State between two yields is guaranteed to be consistent', function(done) {
+        it.skip('Using \'yieldUpdate\', only update state when yielding. State between two yields is guaranteed to be consistent', function(done) {
             this.timeout(5000);
             var client1 = new CClient.Client(true);
             var client2 = new CClient.Client(false);

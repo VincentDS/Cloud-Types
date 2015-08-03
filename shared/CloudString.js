@@ -12,13 +12,15 @@ CloudString.prototype = Object.create(CloudType.prototype);
 
 //methods
 CloudString.prototype.get = function() {
-    var value = this.getValue();
+    var value = this.applyRounds();
     return (value) ? value : '';
 }
 
 CloudString.prototype.set = function(arg) {
     if (typeof arg == 'string') {
-        (arg != '')? this.setValue(arg) : this.deleteEntry();
+        operation = new Operation('set', arg);
+        this.updateRound(operation);
+        //(arg != '')? this.setValue(arg) : this.deleteEntry();
     }
     else
         throw "argument must be a string";
@@ -26,7 +28,10 @@ CloudString.prototype.set = function(arg) {
 
 CloudString.prototype.setIfEmpty = function(arg) {
     if (typeof arg == 'string') {
-        if (this.get() == '') this.set(arg);
+        if (this.applyRounds() == '') {
+            operation = new Operation('set', arg);
+            this.updateRound(operation);
+        }
     }
     else
         throw "argument must be a string";
