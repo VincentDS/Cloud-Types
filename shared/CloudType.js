@@ -9,6 +9,7 @@ function CloudType(field, entry) {
     var fieldid = field+JSON.stringify(entry.keys)+JSON.stringify(entry.index.keys)+JSON.stringify(entry.index.fields);
     var fields = entry.index.state.fields;
 
+
     //privileged methods
     this.getValue = function() {
         return (_.has(fields, fieldid)) ? fields[fieldid] : false;
@@ -17,6 +18,7 @@ function CloudType(field, entry) {
     this.setValue = function(value) {
         fields[fieldid] = value;
     }
+
     this.deleteEntry = function() {
         delete fields[fieldid];
     }

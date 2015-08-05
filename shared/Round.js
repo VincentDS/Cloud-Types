@@ -7,6 +7,10 @@ function Round(client, number) {
     this.delta = new Delta();
 }
 
+Round.prototype.isEmpty = function () {
+    return Object.keys(this.delta.updated).length === 0;
+}
+
 Round.prototype.serializable = function() {
     return {
         client: this.client,

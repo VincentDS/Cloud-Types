@@ -15,18 +15,19 @@ function Client(yieldUpdate) {
     this.yieldUpdate = yieldUpdate;
 
     this.commit = function(cb) {
-        //send current to the server
-        this.socket.emit('round', {round: JSON.stringify(this.current.serializable())})
+        if (!this.current.isEmpty()) {
+            //send current to the server
+            this.socket.emit('round', {round: JSON.stringify(this.current.serializable())})
 
-        //add current to unconfirmed rounds
-        this.unconfirmed.push(this.current)
-        //refresh current round
-        this.current = new Round(this.id, this.current.number+1)
+            //add current to unconfirmed rounds
+            this.unconfirmed.push(this.current)
+            //refresh current round
+            this.current = new Round(this.id, this.current.number+1)
 
-        if (typeof cb === 'function') {
-            cb();
+            if (typeof cb === 'function') {
+                cb();
+            }
         }
-
     };
 
     this.adjustConfirmed = function(maximum) {

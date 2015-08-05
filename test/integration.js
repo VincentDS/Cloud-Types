@@ -92,16 +92,17 @@ describe('Integration', function(){
                 var index = state.get('groceries');
                 var entry = index.get('apples');
                 var cloudint = entry.get('toBuy');
-                cloudint.get().should.be.equal(5);
-                cloudint.add(15);
+                var value = cloudint.get()
+                var addition = 15;
+                cloudint.add(addition);
                 client.yield();
                 //only checks base
-                cloudint.getValue().should.be.equal(5);
+                cloudint.getValue().should.be.equal(value);
                 //also checks current en unconfirmed
-                cloudint.get().should.be.equal(20);
+                cloudint.get().should.be.equal(value+addition);
                 setTimeout(function () {
                     //base must be edited by the received logsegment
-                    cloudint.getValue().should.be.equal(20);
+                    cloudint.getValue().should.be.equal(value+addition);
                     done();
                  }, 3000);
             });

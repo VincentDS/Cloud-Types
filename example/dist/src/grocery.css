@@ -1,0 +1,19 @@
+html {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+    height: 100%;
+}
+
+#app {
+    margin: 0px auto;
+    width: 500px;
+    text-align:center;
+}
+
+
+#form {
+    position: absolute;
+    vertical-align: middle;
+}

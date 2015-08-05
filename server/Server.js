@@ -44,7 +44,6 @@ Server.prototype.start = function(port) {
     console.log('Server running on port ' + port + '...');
 
     io.on('connection', function (socket) {
-        //console.log('Client connected!');
 
         //send state tot connected client
         socket.on('init', function (initClient) {
