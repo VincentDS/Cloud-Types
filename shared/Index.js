@@ -3,8 +3,9 @@ Keys      = require('./Keys'),
 Fields    = require('./Fields');
 
 //constructor
-function Index(keys, fields) {
+function Index(name, keys, fields) {
     this.tag = 'index';
+    this.name = name;
     this.state;
     this.keys = new Keys(keys);
     this.fields = new Fields(fields);
@@ -19,19 +20,16 @@ Index.prototype.get = function() {
         throw 'invalid keys';
 };
 
-Index.prototype.entries = function(key) {
-    // body...
-};
-
 Index.prototype.serializable = function() {
     return {
+        name: this.name,
         keys: this.keys.serializable(),
         fields: this.fields.serializable(),
     }
 };
 
-Index.deserializable = function (json, state) {
-    var index = new Index(json.keys, json.fields);
+Index.deserializable = function (name, json, state) {
+    var index = new Index(name, json.keys, json.fields);
     index.state = state;
     return index;
 }
