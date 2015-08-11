@@ -4,57 +4,52 @@ var injectTapEventPlugin = require('react-tap-event-plugin');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 
+
 var Client = new CClient.Client(false);
 
-var State;
-
 Client.connect('http://localhost:8080', function(state) {
-    State = state;
     var app = new Application(state);
-
     start(app, 500);
 });
 
 function Application (state) {
     this.client = Client
     this.state = state;
-    this.groceries = state.get('groceries');
+    this.groceries = [];
 }
 
 Application.prototype.toBuy = function (name, count) {
   console.log("have to buy " + count + " more of " + name);
-  this.groceries.get(name).get('toBuy').add(count);
+  this.state.get('groceries').get(name).get('toBuy').add(count);
   this.client.yield();
 };
 
-Application.prototype.bought = function (name, count) {
-  console.log("bought " + count + " of " + name);
-  this.groceries.get(name).get('toBuy').add(-count);
-  this.client.yield();
+Application.prototype.get = function (name) {
+  return this.state.get('groceries').get(name).get('toBuy').get();
 };
 
-var stop = function stop() { };
+Application.prototype.update = function () {
+  for (var key in this.state.fields) {
+    if (key.indexOf('groceries') == 0) {
+      var name = key.substring(key.indexOf("<")+1,key.indexOf(">"));
+      var value = app.get(name);
+      this.groceries.push([name, value]);
+    }
+  }
+};
+
+var stop = function stop() {};
 
 function start(app, ms) {
-    var yielding = setInterval(function () {
-        app.client.yield();
-        //app.update();
-    }, ms);
-    stop = function () { clearInterval(yielding); };
-}
 
-
-var GroceryList = React.createClass({
-    getInitialState: function(){
+  var GroceryList = React.createClass({
+    getInitialState: function() {
       return {
-        groceries: [['apples', 2], ['bananas', 5], ['melons', 3]],
+        app: app,
       }
     },
     addGrocery: function(item, quantity){
-      this.state.groceries.push([item, quantity]);
-      this.setState({
-        groceries: this.state.groceries
-      });
+      this.state.app.toBuy(item, parseInt(quantity));
     },
 
     childContextTypes: {
@@ -71,74 +66,93 @@ var GroceryList = React.createClass({
       return (
         <div>
             <h1>CloudTypes Example: Grocery list</h1>
-            <p>This is a shared grocery list. Add new groceries using the form at the bottom and mark the amount you bought of an item by clicking it in the list. </p>
-            <GroceryItems groceries={this.state.groceries}/>
+            <p>This is a shared grocery list. Add new groceries using the form at the bottom and mark the amount you bought of an item by using negative numbers. </p>
+            <GroceryItems app={this.state.app}/>
             <AddGrocery addNew={this.addGrocery}/>
         </div>
       )
     }
-});
+  }).bind(this);
 
-var GroceryItems = React.createClass({
-  render: function(){
-    var listItems = this.props.groceries.map(function(grocery){
-      return <Grocery grocery={grocery}/>;
-    });
-    return (
-        <div>
-          <h2> Groceries </h2>
-          <mui.List>
-            {listItems}
-          </mui.List>
-        </div>
-    )
-  }
-});
+  var GroceryItems = React.createClass({
+    render: function() {
 
-var Grocery = React.createClass({
-  render: function(){
-    return (
-        <mui.ListItem primaryText={this.props.grocery[1] + ' ' + this.props.grocery[0]} />
-    )
-  }
-});
+      var groceries = [];
+      for (var key in this.props.app.state.fields) {
+        if (key.indexOf('groceries') == 0) {
+          var name = key.substring(key.indexOf("<")+1,key.indexOf(">"));
+          var value = this.props.app.get(name);
+          groceries.push(<Grocery name={name} value={value}/>);
+        }
+      }
 
-
-var AddGrocery = React.createClass({
-  getInitialState: function(){
-    return {
-      newGrocery: '',
-      quantity: ''
+      return (
+          <div>
+            <h2> Groceries </h2>
+            <mui.List>
+              {groceries}
+            </mui.List>
+          </div>
+      )
     }
-  },
-  updateNewGrocery: function(e){
-    this.setState({
-      newGrocery: e.target.value
-    });
-  },
-  updateNewQuantity: function(e){
-    this.setState({
-      quantity: e.target.value
-    });
-  },
-  handleAddNew: function(){
-    this.props.addNew(this.state.newGrocery, this.state.quantity);
-    this.setState({
-      newGrocery: '',
-      quantity: ''
-    });
-  },
-  render: function(){
-    return (
-        <form id="form">
-          <mui.TextField value={this.state.newGrocery} hintText='grocery' onChange={this.updateNewGrocery} />
-          <mui.TextField value={this.state.quantity} hintText='quantity' onChange={this.updateNewQuantity} />
-          <mui.FlatButton label="Primary" secondary={true} onClick={this.handleAddNew} label="add"/>
-        </form>
-    );
-  }
-});
+  });
 
-injectTapEventPlugin();
-React.render(<GroceryList/>, document.getElementById('app'));
+  var Grocery = React.createClass({
+    render: function(){
+      return (
+          <mui.ListItem primaryText={this.props.value + ' ' + this.props.name} />
+      )
+    }
+  });
+
+
+  var AddGrocery = React.createClass({
+    getInitialState: function(){
+      return {
+        newGrocery: '',
+        quantity: ''
+      }
+    },
+    updateNewGrocery: function(e){
+      this.setState({
+        newGrocery: e.target.value
+      });
+    },
+    updateNewQuantity: function(e){
+      this.setState({
+        quantity: e.target.value
+      });
+    },
+    handleAddNew: function(){
+      this.props.addNew(this.state.newGrocery, this.state.quantity);
+      this.setState({
+        newGrocery: '',
+        quantity: ''
+      });
+    },
+    render: function(){
+      return (
+          <form id="form">
+            <mui.TextField value={this.state.quantity} hintText='quantity' onChange={this.updateNewQuantity} />
+            <mui.TextField value={this.state.newGrocery} hintText='grocery' onChange={this.updateNewGrocery} />
+            <mui.FlatButton label="Primary" secondary={true} onClick={this.handleAddNew} label="add"/>
+          </form>
+      );
+    }
+  });
+
+  injectTapEventPlugin();
+  React.render(<GroceryList/>, document.getElementById('app'));
+
+
+
+  var yielding = setInterval(function () {
+      app.client.yield();
+      console.log('yielding..');
+      //console.log(app.state.fields)
+  }, ms);
+  stop = function () { clearInterval(yielding); };
+}
+
+
 

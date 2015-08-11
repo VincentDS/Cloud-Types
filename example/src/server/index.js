@@ -2,7 +2,7 @@ CloudTypes = require('./../../../server/Server');
 
 
 var server = CloudTypes.Server;
-
-server.declare('groceries', new CloudTypes.Index([{name: 'string'}], {toBuy: 'CInt'}));
+var indexname = 'groceries';
+server.declare(indexname, new CloudTypes.Index(indexname, [{name: 'string'}], {toBuy: 'CInt'}));
 
 server.start();
