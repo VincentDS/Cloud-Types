@@ -19,12 +19,12 @@ describe('Integration', function(){
 
     describe('Server API', function(){
 
-        var index = new CServer.Index([{name: 'string'}], {toBuy: 'CInt', country: 'CString'});
+        var name = 'groceries'
+        var index = new CServer.Index(name, [{name: 'string'}], {toBuy: 'CInt', country: 'CString'});
 
         it('declaring index on the server', function(){
-            var indexname = 'groceries'
-            server.declare('groceries', index);
-            server.logTail.state.collections[indexname].should.equal(index);
+            server.declare(name, index);
+            server.logTail.state.collections[name].should.equal(index);
         })
 
         it('setting cloudtype on the server', function(){
