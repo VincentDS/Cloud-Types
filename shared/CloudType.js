@@ -6,7 +6,7 @@ function CloudType(field, entry) {
     this.entry = entry;
 
     //private members
-    var fieldid = entry.index.name+'-'+entry.keys[Object.keys(entry.keys)[0]]+'-'+field+JSON.stringify(entry.keys)+JSON.stringify(entry.index.keys)+JSON.stringify(entry.index.fields);
+    var fieldid = entry.index.name+'<'+entry.keys[Object.keys(entry.keys)[0]]+'>'+field+JSON.stringify(entry.keys)+JSON.stringify(entry.index.keys)+JSON.stringify(entry.index.fields);
     var fields = entry.index.state.fields;
 
 
