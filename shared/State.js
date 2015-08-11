@@ -32,9 +32,10 @@ State.prototype.add = function(name, collection) {
 
 //apply a delta on the state
 State.prototype.apply = function(delta) {
-    for (var key in this.fields) {
-        this.fields[key] = delta.apply(key, this.fields[key]);
-    }
+    delta.save(this.fields);
+    // for (var key in this.fields) {
+    //     this.fields[key] = delta.apply(key, this.fields[key]);
+    // }
 };
 
 State.prototype.serializable = function() {
@@ -53,7 +54,7 @@ State.deserializable = function(json) {
     var parsed = JSON.parse(json);
     state.fields = parsed.fields;
     Object.keys(parsed.collections).forEach(function(name) {
-        state.collections[name] = Index.deserializable(parsed.collections[name], state);
+        state.collections[name] = Index.deserializable(name, parsed.collections[name], state);
     });
     return state;
 }

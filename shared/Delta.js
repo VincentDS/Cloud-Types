@@ -48,6 +48,25 @@ Delta.prototype.apply = function(key, value) {
     return value;
 };
 
+//save delta on the state
+Delta.prototype.save = function(fields) {
+    for (var key in this.updated) {
+        var operation = this.updated[key];
+        if (typeof fields[key] != "undefined") {
+            switch(operation.operator) {
+                case 'set':
+                    fields[key] = operation.value;
+                    break;
+                case 'add':
+                    fields[key] += operation.value;
+                    break;
+            }
+        } else {
+            fields[key] = operation.value;
+        }
+    }
+}
+
 //append two delta objects
 Delta.prototype.append = function(delta) {
     for (var key in delta.updated) {
