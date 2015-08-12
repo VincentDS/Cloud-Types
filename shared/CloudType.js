@@ -23,6 +23,10 @@ function CloudType(field, entry) {
         delete fields[fieldid];
     }
 
+    this.existEntry = function() {
+        return _.has(fields, fieldid);
+    }
+
     this.applyRounds = function() {
         //get value of the cloudtype in the base
         var basevalue =  (_.has(fields, fieldid)) ? fields[fieldid] : false;
@@ -49,7 +53,9 @@ function CloudType(field, entry) {
         curRound.delta.update(fieldid, operation);
         //put dummy value in fields
         var basevalue = (isNaN(operation.value))? '' : 0;
-        this.setValue(basevalue);
+        if (!this.existEntry()) {
+            this.setValue(basevalue);
+        }
     }
 
 }

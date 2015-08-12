@@ -22,7 +22,6 @@ CloudInt.prototype.set = function(arg) {
     if (typeof arg == 'number') {
         operation = new Operation('set', arg);
         this.updateRound(operation);
-        //(arg != 0)? this.setValue(arg) : this.deleteEntry();
     }
     else
         throw "argument must be a number";
@@ -32,8 +31,6 @@ CloudInt.prototype.add = function(arg) {
     if (typeof arg == 'number') {
         operation = new Operation('add', arg);
         this.updateRound(operation);
-       // var result = this.get() + arg;
-       // this.set(result);
     }
     else
         throw "argument must be a number";
