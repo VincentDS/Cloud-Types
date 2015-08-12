@@ -15,27 +15,17 @@ Client.connect('http://localhost:8080', function(state) {
 function Application (state) {
     this.client = Client
     this.state = state;
-    this.groceries = [];
 }
 
 Application.prototype.toBuy = function (name, count) {
   console.log("have to buy " + count + " more of " + name);
   this.state.get('groceries').get(name).get('toBuy').add(count);
   this.client.yield();
+  console.log(this.state.fields);
 };
 
 Application.prototype.get = function (name) {
   return this.state.get('groceries').get(name).get('toBuy').get();
-};
-
-Application.prototype.update = function () {
-  for (var key in this.state.fields) {
-    if (key.indexOf('groceries') == 0) {
-      var name = key.substring(key.indexOf("<")+1,key.indexOf(">"));
-      var value = app.get(name);
-      this.groceries.push([name, value]);
-    }
-  }
 };
 
 var stop = function stop() {};
@@ -43,15 +33,30 @@ var stop = function stop() {};
 function start(app, ms) {
 
   var GroceryList = React.createClass({
+
     getInitialState: function() {
       return {
         app: app,
       }
     },
-    addGrocery: function(item, quantity){
-      this.state.app.toBuy(item, parseInt(quantity));
+
+    componentDidMount: function () {
+      var self = this;
+      var yielding = setInterval(function () {
+            self.state.app.client.yield();
+            self.setState({app: self.state.app});
+            console.log('yielding..');
+        }, ms);
+      stop = function () { clearInterval(yielding); };
     },
 
+    addGrocery: function(item, quantity){
+      this.state.app.toBuy(item, parseInt(quantity));
+      this.setState({
+        app: this.state.app,
+      });
+    },
+ 
     childContextTypes: {
         muiTheme: React.PropTypes.object
     },
@@ -72,12 +77,14 @@ function start(app, ms) {
         </div>
       )
     }
-  }).bind(this);
+  });
 
   var GroceryItems = React.createClass({
+
     render: function() {
 
       var groceries = [];
+
       for (var key in this.props.app.state.fields) {
         if (key.indexOf('groceries') == 0) {
           var name = key.substring(key.indexOf("<")+1,key.indexOf(">"));
@@ -144,14 +151,6 @@ function start(app, ms) {
   injectTapEventPlugin();
   React.render(<GroceryList/>, document.getElementById('app'));
 
-
-
-  var yielding = setInterval(function () {
-      app.client.yield();
-      console.log('yielding..');
-      //console.log(app.state.fields)
-  }, ms);
-  stop = function () { clearInterval(yielding); };
 }
 
 
