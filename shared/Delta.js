@@ -33,7 +33,6 @@ Delta.prototype.update = function(key, operation) {
 //apply the delta object on a specific value
 Delta.prototype.apply = function(key, value) {
     if (key in this.updated) {
-        //console.log('key found in this delta!');
         var operation = this.updated[key];
         switch(operation.operator) {
             case 'set':
@@ -88,7 +87,7 @@ Delta.prototype.serializable = function() {
 
 Delta.deserializable = function(json) {
     var delta = new Delta();
-    var parsed = json //JSON.parse(json);
+    var parsed = json 
     Object.keys(parsed.updated).forEach(function(key) {
         delta.updated[key] = Operation.deserializable(parsed.updated[key]);
     });

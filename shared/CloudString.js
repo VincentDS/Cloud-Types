@@ -20,7 +20,6 @@ CloudString.prototype.set = function(arg) {
     if (typeof arg == 'string') {
         operation = new Operation('set', arg);
         this.updateRound(operation);
-        //(arg != '')? this.setValue(arg) : this.deleteEntry();
     }
     else
         throw "argument must be a string";

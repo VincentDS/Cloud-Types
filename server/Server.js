@@ -57,7 +57,6 @@ Server.prototype.start = function(port) {
 
         socket.on('round', function (receiveRound) {
             var round = Round.deserializable(receiveRound.round);
-            //console.log('server received round from client ' + round.client);
             this.receiveRound(round)
         }.bind(this));
 

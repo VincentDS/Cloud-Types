@@ -36,7 +36,6 @@ function Client(yieldUpdate) {
         while (this.unconfirmed.length !== 0 && maximum >= this.unconfirmed[0].number) {
             this.unconfirmed.shift();
         }
-        //console.log(this.state);
     }
 
     this.resendUnconfirmed = function() {
@@ -74,8 +73,8 @@ Client.prototype.connect = function(url, callback) {
     this.socket = io.connect(url, {'forceNew': true });
     this.socket.on('connect', function() {
 
+        //First connection with the server
         if (!this.initiliazed)  {
-            //console.log('First connection with the server!');
             this.socket.emit('init', function (init) {
                 this.id = init.id;
                 this.current =  new Round(this.id, 1);
@@ -84,8 +83,7 @@ Client.prototype.connect = function(url, callback) {
                 this.initiliazed = true;
                 callback(this.state);
             }.bind(this));
-        } else {
-            //console.log('Already has been connected to the server');
+        } else { //Already has been connected to the server
             this.socket.emit('reconnection', function (reconnect) {
                 var logTail = LogTail.deserializable(reconnect.logtail);
                 //replace base state
@@ -101,7 +99,6 @@ Client.prototype.connect = function(url, callback) {
 
         this.socket.on('update', function (logSegment) {
             var logSegment = LogSegment.deserializable(logSegment);
-            //console.log('client ' + this.id + ' received segment : ' + logSegment);
             //add logsegment to the received logsegment list
             this.received.push(logSegment);
             if (!this.yieldUpdate) {
@@ -124,7 +121,7 @@ Client.prototype.yield = function() {
             this.processSegments();
         }
     } else {
-        //console.log('client is disconnected from the server..');
+        //client is disconnected from the server
     }
 };
 
