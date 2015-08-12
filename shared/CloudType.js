@@ -47,6 +47,9 @@ function CloudType(field, entry) {
     this.updateRound = function(operation) {
         var curRound = this.entry.index.state.client.current;
         curRound.delta.update(fieldid, operation);
+        //put dummy value in fields
+        var basevalue = (isNaN(operation.value))? '' : 0;
+        this.setValue(basevalue);
     }
 
 }

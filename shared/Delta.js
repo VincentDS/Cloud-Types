@@ -64,6 +64,8 @@ Delta.prototype.save = function(fields) {
         } else {
             fields[key] = operation.value;
         }
+        if (fields[key] == 0 || fields[key] == '')
+                delete fields[key];
     }
 }
 
