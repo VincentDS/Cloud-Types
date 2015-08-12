@@ -17,3 +17,11 @@ body {
     position: absolute;
     vertical-align: middle;
 }
+
+
+#toggle {
+    float: right;
+    display:inline;
+    margin-right: -200px;
+    margin-top: 10px;
+}

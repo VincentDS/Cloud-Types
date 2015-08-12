@@ -18,10 +18,9 @@ function Application (state) {
 }
 
 Application.prototype.toBuy = function (name, count) {
-  console.log("have to buy " + count + " more of " + name);
+  //console.log("have to buy " + count + " more of " + name);
   this.state.get('groceries').get(name).get('toBuy').add(count);
   this.client.yield();
-  console.log(this.state.fields);
 };
 
 Application.prototype.get = function (name) {
@@ -37,6 +36,7 @@ function start(app, ms) {
     getInitialState: function() {
       return {
         app: app,
+        status: 'online',
       }
     },
 
@@ -44,8 +44,10 @@ function start(app, ms) {
       var self = this;
       var yielding = setInterval(function () {
             self.state.app.client.yield();
-            self.setState({app: self.state.app});
-            console.log('yielding..');
+            self.setState({
+              app: self.state.app,
+            });
+            //console.log('yielding..');
         }, ms);
       stop = function () { clearInterval(yielding); };
     },
@@ -55,6 +57,24 @@ function start(app, ms) {
       this.setState({
         app: this.state.app,
       });
+    },
+
+    changeConnection: function(e, toggled) {
+      if (toggled) {
+          var self = this
+          app.client.connect('http://localhost:8080', function(state) {
+              self.state.app.state = state;
+              self.setState({
+                app: self.state.app,
+                status: 'online'
+              });
+          });
+      } else {
+          app.client.disconnect();
+          this.setState({
+            status: 'offline'
+          });
+      }
     },
  
     childContextTypes: {
@@ -70,10 +90,13 @@ function start(app, ms) {
     render: function(){
       return (
         <div>
-            <h1>CloudTypes Example: Grocery list</h1>
-            <p>This is a shared grocery list. Add new groceries using the form at the bottom and mark the amount you bought of an item by using negative numbers. </p>
-            <GroceryItems app={this.state.app}/>
-            <AddGrocery addNew={this.addGrocery}/>
+              <span id='toggle'>
+                <mui.Toggle name="connectivity" label={this.state.status} onToggle={this.changeConnection} labelPosition="right" defaultToggled={true} />
+              </span>
+              <h1>CloudTypes Example: Grocery list</h1> 
+              <p>This is a shared grocery list. Add new groceries using the form at the bottom and mark the amount you bought of an item by using negative numbers. </p>
+              <GroceryItems app={this.state.app}/>
+              <AddGrocery addNew={this.addGrocery}/>
         </div>
       )
     }
@@ -89,7 +112,9 @@ function start(app, ms) {
         if (key.indexOf('groceries') == 0) {
           var name = key.substring(key.indexOf("<")+1,key.indexOf(">"));
           var value = this.props.app.get(name);
-          groceries.push(<Grocery name={name} value={value}/>);
+          if (value != 0) {
+            groceries.push(<Grocery name={name} value={value}/>);
+          }
         }
       }
 
@@ -131,17 +156,21 @@ function start(app, ms) {
       });
     },
     handleAddNew: function(){
-      this.props.addNew(this.state.newGrocery, this.state.quantity);
-      this.setState({
-        newGrocery: '',
-        quantity: ''
-      });
+      if (this.state.newGrocery == '' || this.state.quantity == '') {
+        //
+      } else {
+        this.props.addNew(this.state.newGrocery, this.state.quantity);
+        this.setState({
+          newGrocery: '',
+          quantity: ''
+        });
+      }
     },
     render: function(){
       return (
           <form id="form">
-            <mui.TextField value={this.state.quantity} hintText='quantity' onChange={this.updateNewQuantity} />
-            <mui.TextField value={this.state.newGrocery} hintText='grocery' onChange={this.updateNewGrocery} />
+            <mui.TextField id='quantity' value={this.state.quantity} hintText='quantity' onChange={this.updateNewQuantity}/>
+            <mui.TextField ref='grocery' value={this.state.newGrocery} hintText='grocery' onChange={this.updateNewGrocery}/>
             <mui.FlatButton label="Primary" secondary={true} onClick={this.handleAddNew} label="add"/>
           </form>
       );
